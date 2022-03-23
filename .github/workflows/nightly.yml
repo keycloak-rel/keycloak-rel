@@ -1,0 +1,111 @@
+name: Nightly release
+
+on:
+  workflow_dispatch:
+
+concurrency: keycloak-release
+
+jobs:
+  keycloak:
+    name: Keycloak
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Setup Java
+      # actions/setup-java@v3.0.0
+      uses: actions/setup-java@f69f00b5e5324696b07f6b1c92f0470a6df00780
+      with:
+        distribution: 'temurin'
+        java-version: 11
+        server-id: jboss-snapshots-repository
+        server-username: MAVEN_USERNAME
+        server-password: MAVEN_PASSWORD
+        gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+        gpg-passphrase: MAVEN_GPG_PASSPHRASE
+
+    - name: Checkout Keycloak repository
+      # actions/checkout@v3.0.0
+      uses: actions/checkout@a12a3943b4bdde767164f792f33f40b04645d846
+      with:
+        repository: 'keycloak/keycloak'
+        token: ${{ secrets.GH_TOKEN }}
+        path: keycloak
+        
+    - name: Update nightly tag
+      run: |
+        git tag -f nightly
+        git push origin nightly --force
+      working-directory: ./keycloak
+        
+    - name: Deploy Keycloak
+      env:
+        MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+        MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+        MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}        
+      working-directory: ./keycloak
+      run: mvn -nsu -B -Pgpg,jboss-release,nexus-staging,distribution-downloads -DskipTests -DskipTestsuite -DretryFailedDeploymentCount=10 -DautoReleaseAfterClose=true clean deploy
+
+    - name: Upload Keycloak release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+      run: |
+        gh release list -R keycloak/keycloak | grep ^nightly >/dev/null && gh release delete -R keycloak/keycloak nightly -y
+        gh release create -R keycloak/keycloak -p --target main --title nightly --notes "Nightly" nightly
+        gh release upload -R keycloak/keycloak nightly ./distribution/downloads/target/18.0.0-SNAPSHOT/*
+      working-directory: ./keycloak
+      
+  keycloak-container:
+    name: Keycloak Container
+    runs-on: ubuntu-latest
+    needs: [keycloak]
+
+    steps:
+    - name: Checkout Keycloak repository
+      # actions/checkout@v3.0.0
+      uses: actions/checkout@a12a3943b4bdde767164f792f33f40b04645d846
+      with:
+        repository: 'keycloak/keycloak'
+        token: ${{ secrets.GH_TOKEN }}
+        path: keycloak
+        
+    - name: Setup QEMU
+      # docker/setup-qemu-action@v1.2.0
+      uses: docker/setup-qemu-action@27d0a4f181a40b142cce983c5393082c365d1480
+      
+    - name: Setup Docker Buildx
+      # docker/setup-buildx-action@v1.6.0
+      uses: docker/setup-buildx-action@94ab11c41e45d028884a99163086648e898eed25
+      
+    - name: Container metadata
+      id: meta
+      # docker/metadata-action@v3.6.2
+      uses: docker/metadata-action@e5622373a38e60fb6d795a4421e56882f2d7a681
+      with:
+        images: quay.io/keycloak/keycloak
+        tags: |
+          type=raw,value=nightly
+          
+    - name: Login to Quay
+      # docker/login-action@v1.14.1
+      uses: docker/login-action@dd4fa0671be5250ee6f50aedf4cb05514abda2c7
+      with:
+        registry: quay.io
+        username: ${{ secrets.QUAY_USERNAME }}
+        password: ${{ secrets.QUAY_TOKEN }}
+        
+    - name: Download Keycloak
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}    
+      run: |
+        gh release download -R keycloak/keycloak -p keycloak-18.0.0-SNAPSHOT.tar.gz -D ./keycloak/quarkus/container nightly
+
+    - name: Build and push
+      # docker/build-push-action@v2.10.0
+      uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a
+      with:
+        context: keycloak/quarkus/container
+        platforms: linux/amd64,linux/arm64
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        build-args: KEYCLOAK_DIST=keycloak-18.0.0-SNAPSHOT.tar.gz
