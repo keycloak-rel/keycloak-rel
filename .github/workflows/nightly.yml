@@ -51,7 +51,7 @@ jobs:
       run: |
         gh release list -R keycloak/keycloak | grep ^nightly >/dev/null && gh release delete -R keycloak/keycloak nightly -y
         gh release create -R keycloak/keycloak -p --target main --title nightly --notes "Nightly" nightly
-        gh release upload -R keycloak/keycloak nightly ./distribution/downloads/target/18.0.0-SNAPSHOT/*
+        gh release upload -R keycloak/keycloak nightly ./distribution/downloads/target/999-SNAPSHOT/*
       working-directory: ./keycloak
       
   keycloak-container:
@@ -97,7 +97,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}    
       run: |
-        gh release download -R keycloak/keycloak -p keycloak-18.0.0-SNAPSHOT.tar.gz -D ./keycloak/quarkus/container nightly
+        gh release download -R keycloak/keycloak -p keycloak-999-SNAPSHOT.tar.gz -D ./keycloak/quarkus/container nightly
 
     - name: Build and push
       # docker/build-push-action@v2.10.0
@@ -108,4 +108,4 @@ jobs:
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-        build-args: KEYCLOAK_DIST=keycloak-18.0.0-SNAPSHOT.tar.gz
+        build-args: KEYCLOAK_DIST=keycloak-999-SNAPSHOT.tar.gz
