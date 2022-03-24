@@ -152,11 +152,12 @@ jobs:
           password: ${{ secrets.QUAY_TOKEN }}
 
       - name: Build locally Keycloak artifacts to avoid depending on Maven
+        working-directory: keycloak
         run: |
           mvn -P operator -pl operator -am clean install -DskipTests
 
       - name: Build the operator Docker image
-        working-directory: operator
+        working-directory: keycloak/operator
         run: |
           echo "${{ steps.meta.outputs.tags }}" | xargs -I {} \
           mvn clean package \
