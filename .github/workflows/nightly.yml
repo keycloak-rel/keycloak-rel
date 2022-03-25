@@ -51,7 +51,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |
-        gh release view nightly | grep 'asset:' | cut -f 2 | xargs -I {} echo gh release delete-asset {} -y
+        gh release view nightly | grep 'asset:' | cut -f 2 | xargs -I {} gh release delete-asset {} -y
         gh release upload -R keycloak/keycloak nightly ./distribution/downloads/target/999-SNAPSHOT/*
       working-directory: ./keycloak
       
