@@ -7,149 +7,153 @@ on:
 
 concurrency: keycloak-release
 
+env:
+  KEYCLOAK_ORG: "andreaTP"
+  # KEYCLOAK_ORG: "keycloak"
+
 jobs:
 
-  keycloak-admin-console:
-    name: Keycloak Admin Console
-    runs-on: ubuntu-latest
+  # keycloak-admin-console:
+  #   name: Keycloak Admin Console
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: Setup Java
-        # actions/setup-java@v3.0.0
-        uses: actions/setup-java@f69f00b5e5324696b07f6b1c92f0470a6df00780
-        with:
-          distribution: 'temurin'
-          java-version: 11
-          server-id: jboss-snapshots-repository
-          server-username: MAVEN_USERNAME
-          server-password: MAVEN_PASSWORD
-          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
-          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+  #   steps:
+  #     - name: Setup Java
+  #       # actions/setup-java@v3.0.0
+  #       uses: actions/setup-java@f69f00b5e5324696b07f6b1c92f0470a6df00780
+  #       with:
+  #         distribution: 'temurin'
+  #         java-version: 11
+  #         server-id: jboss-snapshots-repository
+  #         server-username: MAVEN_USERNAME
+  #         server-password: MAVEN_PASSWORD
+  #         gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+  #         gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
-      - name: Checkout Keycloak Admin UI repository
-        # actions/checkout@v3.0.0
-        uses: actions/checkout@a12a3943b4bdde767164f792f33f40b04645d846
-        with:
-          repository: 'keycloak/keycloak-admin-ui'
-          token: ${{ secrets.GH_TOKEN }}
-          path: keycloak-admin-ui
+  #     - name: Checkout Keycloak Admin UI repository
+  #       # actions/checkout@v3.0.0
+  #       uses: actions/checkout@a12a3943b4bdde767164f792f33f40b04645d846
+  #       with:
+  #         repository: 'keycloak/keycloak-admin-ui'
+  #         token: ${{ secrets.GH_TOKEN }}
+  #         path: keycloak-admin-ui
 
-      - name: Deploy Keycloak Admin UI
-        env:
-          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
-          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-        working-directory: ./keycloak-admin-ui/keycloak-theme
-        run: mvn -nsu -B -Pnexus-staging -DskipTests -DretryFailedDeploymentCount=10 -DautoReleaseAfterClose=true clean deploy
+  #     - name: Deploy Keycloak Admin UI
+  #       env:
+  #         MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+  #         MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+  #         MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+  #       working-directory: ./keycloak-admin-ui/keycloak-theme
+  #       run: mvn -nsu -B -Pnexus-staging -DskipTests -DretryFailedDeploymentCount=10 -DautoReleaseAfterClose=true clean deploy
 
-  keycloak:
-    name: Keycloak
-    runs-on: ubuntu-latest
-    needs: [keycloak-admin-console]
+  # keycloak:
+  #   name: Keycloak
+  #   runs-on: ubuntu-latest
+  #   needs: [keycloak-admin-console]
 
-    steps:
-    - name: Setup Java
-      # actions/setup-java@v3.0.0
-      uses: actions/setup-java@f69f00b5e5324696b07f6b1c92f0470a6df00780
-      with:
-        distribution: 'temurin'
-        java-version: 11
-        server-id: jboss-snapshots-repository
-        server-username: MAVEN_USERNAME
-        server-password: MAVEN_PASSWORD
-        gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
-        gpg-passphrase: MAVEN_GPG_PASSPHRASE
+  #   steps:
+  #   - name: Setup Java
+  #     # actions/setup-java@v3.0.0
+  #     uses: actions/setup-java@f69f00b5e5324696b07f6b1c92f0470a6df00780
+  #     with:
+  #       distribution: 'temurin'
+  #       java-version: 11
+  #       server-id: jboss-snapshots-repository
+  #       server-username: MAVEN_USERNAME
+  #       server-password: MAVEN_PASSWORD
+  #       gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+  #       gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
-    - name: Checkout Keycloak repository
-      # actions/checkout@v3.0.0
-      uses: actions/checkout@a12a3943b4bdde767164f792f33f40b04645d846
-      with:
-        repository: 'keycloak/keycloak'
-        token: ${{ secrets.GH_TOKEN }}
-        path: keycloak
+  #   - name: Checkout Keycloak repository
+  #     # actions/checkout@v3.0.0
+  #     uses: actions/checkout@a12a3943b4bdde767164f792f33f40b04645d846
+  #     with:
+  #       repository: 'keycloak/keycloak'
+  #       token: ${{ secrets.GH_TOKEN }}
+  #       path: keycloak
         
-    - name: Update nightly tag
-      run: |
-        git tag -f nightly
-        git push origin nightly --force
-      working-directory: ./keycloak
+  #   - name: Update nightly tag
+  #     run: |
+  #       git tag -f nightly
+  #       git push origin nightly --force
+  #     working-directory: ./keycloak
 
-    - name: Download Keycloak Admin UI
-      run: |
-        mvn org.apache.maven.plugins:maven-dependency-plugin:2.1:get -DrepoUrl=https://s01.oss.sonatype.org/content/repositories/snapshots/ -Dartifact=org.keycloak:keycloak-admin-ui:999-SNAPSHOT
-      working-directory: ./keycloak
+  #   - name: Download Keycloak Admin UI
+  #     run: |
+  #       mvn org.apache.maven.plugins:maven-dependency-plugin:2.1:get -DrepoUrl=https://s01.oss.sonatype.org/content/repositories/snapshots/ -Dartifact=org.keycloak:keycloak-admin-ui:999-SNAPSHOT
+  #     working-directory: ./keycloak
         
-    - name: Deploy Keycloak
-      env:
-        MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-        MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
-        MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}        
-      working-directory: ./keycloak
-      run: mvn -nsu -B -Padmin-preview,gpg,jboss-release,nexus-staging,distribution-downloads -DskipTests -DskipTestsuite -DretryFailedDeploymentCount=10 -DautoReleaseAfterClose=true clean deploy
+  #   - name: Deploy Keycloak
+  #     env:
+  #       MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+  #       MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+  #       MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}        
+  #     working-directory: ./keycloak
+  #     run: mvn -nsu -B -Padmin-preview,gpg,jboss-release,nexus-staging,distribution-downloads -DskipTests -DskipTestsuite -DretryFailedDeploymentCount=10 -DautoReleaseAfterClose=true clean deploy
 
-    - name: Upload Keycloak release
-      env:
-        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-      run: |
-        gh release view nightly | grep 'asset:' | cut -f 2 | xargs -I '{}' gh release delete-asset nightly '{}' -y
-        gh release upload -R keycloak/keycloak nightly ./distribution/downloads/target/999-SNAPSHOT/*
-      working-directory: ./keycloak
+  #   - name: Upload Keycloak release
+  #     env:
+  #       GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+  #     run: |
+  #       gh release view nightly | grep 'asset:' | cut -f 2 | xargs -I '{}' gh release delete-asset nightly '{}' -y
+  #       gh release upload -R keycloak/keycloak nightly ./distribution/downloads/target/999-SNAPSHOT/*
+  #     working-directory: ./keycloak
       
-  keycloak-container:
-    name: Keycloak Container
-    runs-on: ubuntu-latest
-    needs: [keycloak]
+  # keycloak-container:
+  #   name: Keycloak Container
+  #   runs-on: ubuntu-latest
+  #   needs: [keycloak]
 
-    steps:
-    - name: Checkout Keycloak repository
-      # actions/checkout@v3.0.0
-      uses: actions/checkout@a12a3943b4bdde767164f792f33f40b04645d846
-      with:
-        repository: 'keycloak/keycloak'
-        token: ${{ secrets.GH_TOKEN }}
-        path: keycloak
+  #   steps:
+  #   - name: Checkout Keycloak repository
+  #     # actions/checkout@v3.0.0
+  #     uses: actions/checkout@a12a3943b4bdde767164f792f33f40b04645d846
+  #     with:
+  #       repository: 'keycloak/keycloak'
+  #       token: ${{ secrets.GH_TOKEN }}
+  #       path: keycloak
         
-    - name: Setup QEMU
-      # docker/setup-qemu-action@v1.2.0
-      uses: docker/setup-qemu-action@27d0a4f181a40b142cce983c5393082c365d1480
+  #   - name: Setup QEMU
+  #     # docker/setup-qemu-action@v1.2.0
+  #     uses: docker/setup-qemu-action@27d0a4f181a40b142cce983c5393082c365d1480
       
-    - name: Setup Docker Buildx
-      # docker/setup-buildx-action@v1.6.0
-      uses: docker/setup-buildx-action@94ab11c41e45d028884a99163086648e898eed25
+  #   - name: Setup Docker Buildx
+  #     # docker/setup-buildx-action@v1.6.0
+  #     uses: docker/setup-buildx-action@94ab11c41e45d028884a99163086648e898eed25
       
-    - name: Container metadata
-      id: meta
-      # docker/metadata-action@v3.6.2
-      uses: docker/metadata-action@e5622373a38e60fb6d795a4421e56882f2d7a681
-      with:
-        images: quay.io/keycloak/keycloak
-        tags: |
-          type=raw,value=nightly
+  #   - name: Container metadata
+  #     id: meta
+  #     # docker/metadata-action@v3.6.2
+  #     uses: docker/metadata-action@e5622373a38e60fb6d795a4421e56882f2d7a681
+  #     with:
+  #       images: quay.io/keycloak/keycloak
+  #       tags: |
+  #         type=raw,value=nightly
           
-    - name: Login to Quay
-      # docker/login-action@v1.14.1
-      uses: docker/login-action@dd4fa0671be5250ee6f50aedf4cb05514abda2c7
-      with:
-        registry: quay.io
-        username: ${{ secrets.QUAY_USERNAME }}
-        password: ${{ secrets.QUAY_TOKEN }}
+  #   - name: Login to Quay
+  #     # docker/login-action@v1.14.1
+  #     uses: docker/login-action@dd4fa0671be5250ee6f50aedf4cb05514abda2c7
+  #     with:
+  #       registry: quay.io
+  #       username: ${{ secrets.QUAY_USERNAME }}
+  #       password: ${{ secrets.QUAY_TOKEN }}
         
-    - name: Download Keycloak
-      env:
-        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}    
-      run: |
-        gh release download -R keycloak/keycloak -p keycloak-999-SNAPSHOT.tar.gz -D ./keycloak/quarkus/container nightly
+  #   - name: Download Keycloak
+  #     env:
+  #       GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}    
+  #     run: |
+  #       gh release download -R keycloak/keycloak -p keycloak-999-SNAPSHOT.tar.gz -D ./keycloak/quarkus/container nightly
 
-    - name: Build and push
-      # docker/build-push-action@v2.10.0
-      uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a
-      with:
-        context: keycloak/quarkus/container
-        platforms: linux/amd64,linux/arm64
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
-        build-args: KEYCLOAK_DIST=keycloak-999-SNAPSHOT.tar.gz
+  #   - name: Build and push
+  #     # docker/build-push-action@v2.10.0
+  #     uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a
+  #     with:
+  #       context: keycloak/quarkus/container
+  #       platforms: linux/amd64,linux/arm64
+  #       push: true
+  #       tags: ${{ steps.meta.outputs.tags }}
+  #       labels: ${{ steps.meta.outputs.labels }}
+  #       build-args: KEYCLOAK_DIST=keycloak-999-SNAPSHOT.tar.gz
 
   keycloak-operator:
     name: Keycloak Operator
@@ -157,50 +161,76 @@ jobs:
     needs: [keycloak]
 
     steps:
-      - name: Checkout Keycloak repository
-        # actions/checkout@v3.0.0
-        uses: actions/checkout@a12a3943b4bdde767164f792f33f40b04645d846
+      # - name: Checkout Keycloak repository
+      #   # actions/checkout@v3.0.0
+      #   uses: actions/checkout@a12a3943b4bdde767164f792f33f40b04645d846
+      #   with:
+      #     repository: 'keycloak/keycloak'
+      #     token: ${{ secrets.GH_TOKEN }}
+      #     path: keycloak
+
+      # - name: Setup QEMU
+      #   # docker/setup-qemu-action@v1.2.0
+      #   uses: docker/setup-qemu-action@27d0a4f181a40b142cce983c5393082c365d1480
+
+      # - name: Setup Docker Buildx
+      #   # docker/setup-buildx-action@v1.6.0
+      #   uses: docker/setup-buildx-action@94ab11c41e45d028884a99163086648e898eed25
+
+      # - name: Container metadata
+      #   id: meta
+      #   # docker/metadata-action@v3.6.2
+      #   uses: docker/metadata-action@e5622373a38e60fb6d795a4421e56882f2d7a681
+      #   with:
+      #     images: quay.io/keycloak/keycloak-operator
+      #     tags: |
+      #       type=raw,value=nightly
+
+      # - name: Login to Quay
+      #   # docker/login-action@v1.14.1
+      #   uses: docker/login-action@dd4fa0671be5250ee6f50aedf4cb05514abda2c7
+      #   with:
+      #     registry: quay.io
+      #     username: ${{ secrets.QUAY_USERNAME }}
+      #     password: ${{ secrets.QUAY_TOKEN }}
+
+      # - name: Build locally Keycloak artifacts to avoid depending on Maven
+      #   working-directory: keycloak
+      #   run: |
+      #     mvn -P operator -pl operator -am clean install -DskipTests
+
+      # - name: Build the operator Docker image
+      #   working-directory: keycloak/operator
+      #   run: |
+      #     echo "${{ steps.meta.outputs.tags }}" | xargs -I {} \
+      #     mvn clean package \
+      #         -DskipTests \
+      #         -Dquarkus.container-image.image={} \
+      #         -Dquarkus.container-image.build=true \
+      #         -Dquarkus.container-image.push=true
+
+      - name: Clone kubernetes resources repo
+        uses: actions/checkout@v3
         with:
-          repository: 'keycloak/keycloak'
+          repository: ${{ env.KEYCLOAK_ORG }}/keycloak-k8s-resources
+          path: keycloak-k8s-resources
           token: ${{ secrets.GH_TOKEN }}
-          path: keycloak
+          # TODO: this branch needs to be created
+          ref: nightly
 
-      - name: Setup QEMU
-        # docker/setup-qemu-action@v1.2.0
-        uses: docker/setup-qemu-action@27d0a4f181a40b142cce983c5393082c365d1480
-
-      - name: Setup Docker Buildx
-        # docker/setup-buildx-action@v1.6.0
-        uses: docker/setup-buildx-action@94ab11c41e45d028884a99163086648e898eed25
-
-      - name: Container metadata
-        id: meta
-        # docker/metadata-action@v3.6.2
-        uses: docker/metadata-action@e5622373a38e60fb6d795a4421e56882f2d7a681
-        with:
-          images: quay.io/keycloak/keycloak-operator
-          tags: |
-            type=raw,value=nightly
-
-      - name: Login to Quay
-        # docker/login-action@v1.14.1
-        uses: docker/login-action@dd4fa0671be5250ee6f50aedf4cb05514abda2c7
-        with:
-          registry: quay.io
-          username: ${{ secrets.QUAY_USERNAME }}
-          password: ${{ secrets.QUAY_TOKEN }}
-
-      - name: Build locally Keycloak artifacts to avoid depending on Maven
-        working-directory: keycloak
+      - name: Release kubernetes resources
+        working-directory: keycloak-k8s-resources
         run: |
-          mvn -P operator -pl operator -am clean install -DskipTests
+          # Delete old tags
+          git tag -d nightly | true
 
-      - name: Build the operator Docker image
-        working-directory: keycloak/operator
-        run: |
-          echo "${{ steps.meta.outputs.tags }}" | xargs -I {} \
-          mvn clean package \
-              -DskipTests \
-              -Dquarkus.container-image.image={} \
-              -Dquarkus.container-image.build=true \
-              -Dquarkus.container-image.push=true
+          rm -rf kubernetes
+          mkdir -p kubernetes
+          echo "test" > kubernetes/test.yaml
+          # cp -r ../keycloak/operator/target/kubernetes/*.yml kubernetes
+          
+          git add .
+          git commit -m "Automatic update"
+          git tag nightly
+          git push origin HEAD:refs/heads/nightly --force
+          git push origin refs/tags/nightly --force
