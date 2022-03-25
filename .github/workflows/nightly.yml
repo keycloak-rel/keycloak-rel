@@ -216,7 +216,7 @@ jobs:
           repository: ${{ env.KEYCLOAK_ORG }}/keycloak-k8s-resources
           path: keycloak-k8s-resources
           token: ${{ secrets.GH_TOKEN }}
-          # TODO: this branch needs to be created
+          # TODO: this branch needs to exist
           ref: nightly
 
       - name: Release kubernetes resources
