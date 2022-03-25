@@ -40,7 +40,7 @@ jobs:
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         working-directory: ./keycloak-admin-ui/keycloak-theme
-        run: mvn -nsu -B -Pnexus-staging -DskipTests -DretryFailedDeploymentCount=10 -DautoReleaseAfterClose=true clean deploy
+        run: mvn -nsu -B -Padmin-preview,nexus-staging -DskipTests -DretryFailedDeploymentCount=10 -DautoReleaseAfterClose=true clean deploy
 
   keycloak:
     name: Keycloak
