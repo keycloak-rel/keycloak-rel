@@ -218,6 +218,12 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
           # TODO: this branch needs to exist
           ref: nightly
+      
+      - name: Configure Git user
+        run: |
+          # TODO: use keycloak-bot here
+          git config --global user.email "andrea.peruffo1982@gmail.com"
+          git config --global user.name "Andrea Peruffo"
 
       - name: Release kubernetes resources
         working-directory: keycloak-k8s-resources
