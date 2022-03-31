@@ -219,7 +219,6 @@ jobs:
       
       - name: Configure Git user
         run: |
-          # TODO: use keycloak-bot here
           git config --global user.email "keycloak.bot@gmail.com"
           git config --global user.name "keycloak-bot"
 
