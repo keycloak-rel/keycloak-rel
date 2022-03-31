@@ -226,15 +226,10 @@ jobs:
       - name: Release kubernetes resources
         working-directory: keycloak-k8s-resources
         run: |
-          # Delete old tags
-          git tag -d nightly | true
-
           rm -rf kubernetes
           mkdir -p kubernetes
           cp -r ../keycloak/operator/target/kubernetes/*.yml kubernetes
           
           git add .
           git commit -m "Automatic update"
-          git tag nightly
           git push origin HEAD:refs/heads/nightly --force
-          git push origin refs/tags/nightly --force
