@@ -209,7 +209,8 @@ jobs:
               -Dquarkus.container-image.push=true
 
       - name: Clone kubernetes resources repo
-        uses: actions/checkout@v3
+        # actions/checkout@v3.0.0
+        uses: actions/checkout@a12a3943b4bdde767164f792f33f40b04645d846
         with:
           repository: ${{ env.KEYCLOAK_ORG }}/keycloak-k8s-resources
           path: keycloak-k8s-resources
