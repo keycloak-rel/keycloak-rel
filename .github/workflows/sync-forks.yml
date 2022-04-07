@@ -1,0 +1,41 @@
+name: Sync forks
+
+on:
+  workflow_dispatch:
+
+concurrency: keycloak-release
+
+jobs:
+
+  sync-branches:
+    name: Rebase from upstream
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        repository:
+          - keycloak
+          - keycloak-admin-ui
+          - keycloak-containers
+          - keycloak-documentation
+          - keycloak-nodejs-admin-client
+          - keycloak-nodejs-connect
+          - keycloak-operator
+          - keycloak-quickstarts
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        repository: '${{ secrets.GH_ORG }}/${{ matrix.repository }}'
+        token: ${{ secrets.GH_TOKEN }}
+        path: ${{ matrix.repository }}
+        ref: 'main'
+
+    - name: Sync main branch from upstream
+      run: |
+        git remote add upstream https://github.com/keycloak/${{ matrix.repository }}.git
+        git fetch upstream
+        git rebase upstream/main
+        git push origin main:main
+      working-directory: ${{ matrix.repository }}

@@ -1,0 +1,73 @@
+name: X Keycloak
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+      tag:
+        required: true
+        type: string
+    secrets:
+      GH_ORG:
+        required: true
+      GH_TOKEN:
+        required: true
+      MVN_URL:
+        required: true
+      MVN_USERNAME:
+        required: true
+      MVN_TOKEN:
+        required: true
+      GPG_PASSPHRASE:
+        required: true
+      GPG_PRIVATE_KEY:
+        required: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup Java
+        uses: actions/setup-java@v3.0.0
+        with:
+          distribution: 'temurin'
+          java-version: 11
+          server-id: kc-rel-repository
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+
+      - name: Checkout repository
+        uses: actions/checkout@v3.0.0
+        with:
+          repository: '${{ secrets.GH_ORG }}/keycloak'
+          token: ${{ secrets.GH_TOKEN }}
+          path: keycloak
+          ref: ${{ inputs.tag }}
+
+      - name: Deploy Keycloak
+        env:
+          MAVEN_ID: kc-rel-repository
+          MAVEN_URL: ${{ secrets.MVN_URL }}
+          MAVEN_USERNAME: ${{ secrets.MVN_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.MVN_TOKEN }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        working-directory: ./keycloak
+        run: |
+          mvn -s ./.github/mvn-rel-settings.xml -nsu -B -Pgpg,jboss-release,distribution-downloads -Djboss.releases.repo.id=$MAVEN_ID -Djboss.releases.repo.url=${{ secrets.MVN_URL }} -Djboss.snapshots.repo.id=$MAVEN_ID -Djboss.snapshots.repo.url=${{ secrets.MVN_URL }} -DskipTests -DskipTestsuite -DretryFailedDeploymentCount=10 -DautoReleaseAfterClose=true clean deploy
+
+      - name: Upload Keycloak release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          if [ ${{ inputs.tag }} == 'nightly' ]; then
+            gh release view nightly | grep 'asset:' | cut -f 2 | xargs -I '{}' gh release delete-asset nightly '{}' -y
+          else
+            gh release create ${{ inputs.tag }}
+          fi
+          gh release upload ${{ inputs.tag }} ./distribution/downloads/target/${{ inputs.version }}/*
+        working-directory: ./keycloak
