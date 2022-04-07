@@ -1,0 +1,61 @@
+name: X Keycloak Admin Console
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+      tag:
+        required: true
+        type: string
+    secrets:
+      GH_ORG:
+        required: true
+      GH_TOKEN:
+        required: true
+      MVN_URL:
+        required: true
+      MVN_USERNAME:
+        required: true
+      MVN_TOKEN:
+        required: true
+      GPG_PASSPHRASE:
+        required: true
+      GPG_PRIVATE_KEY:
+        required: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup Java
+        uses: actions/setup-java@v3.0.0
+        with:
+          distribution: 'temurin'
+          java-version: 11
+          server-id: kc-rel-repository
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+
+      - name: Checkout repository
+        uses: actions/checkout@v3.0.0
+        with:
+          repository: '${{ secrets.GH_ORG }}/keycloak-admin-ui'
+          token: ${{ secrets.GH_TOKEN }}
+          path: keycloak-admin-ui
+          ref: ${{ inputs.tag }}
+
+      - name: Deploy Keycloak Admin UI
+        env:
+          MAVEN_ID: kc-rel-repository
+          MAVEN_URL: ${{ secrets.MVN_URL }}
+          MAVEN_USERNAME: ${{ secrets.MVN_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.MVN_TOKEN }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        working-directory: ./keycloak-admin-ui/keycloak-theme
+        run: |
+          mvn -nsu -B -Pgpg -Djboss.releases.repo.id=$MAVEN_ID -Djboss.releases.repo.url=${{ secrets.MVN_URL }} -Djboss.snapshots.repo.id=$MAVEN_ID -Djboss.snapshots.repo.url=${{ secrets.MVN_URL }} -DskipTests -DretryFailedDeploymentCount=10 -DautoReleaseAfterClose=true clean deploy
