@@ -1,4 +1,4 @@
-name: Branch - Release Delete
+name: Branch - Delete Release
 
 on:
   workflow_dispatch:
