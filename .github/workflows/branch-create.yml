@@ -1,0 +1,41 @@
+name: Branch - Create Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      majorMinorVersion:
+        description: 'Major.minor version (for example 18.0)'
+        required: true
+
+concurrency: keycloak-release
+
+jobs:
+
+  create-branch:
+    name: Create branch
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        repository:
+          - keycloak
+          - keycloak-admin-ui
+          - keycloak-containers
+          - keycloak-documentation
+          - keycloak-nodejs-admin-client
+          - keycloak-nodejs-connect
+          - keycloak-operator
+          - keycloak-quickstarts
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        repository: '${{ secrets.GH_ORG }}/${{ matrix.repository }}'
+        ref: 'main'
+        token: ${{ secrets.GH_TOKEN }}
+        path: ${{ matrix.repository }}
+
+    - name: Push release branch
+      run: git push origin main:${{ github.event.inputs.majorMinorVersion }}
+      working-directory: ${{ matrix.repository }}
