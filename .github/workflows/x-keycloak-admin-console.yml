@@ -41,21 +41,20 @@ jobs:
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v3.0.0
         with:
           repository: '${{ secrets.GH_ORG }}/keycloak-admin-ui'
           token: ${{ secrets.GH_TOKEN }}
-          path: keycloak-admin-ui
           ref: ${{ inputs.tag }}
 
-      - name: Deploy Keycloak Admin UI
+      - name: Deploy to Maven
         env:
           MAVEN_ID: kc-rel-repository
           MAVEN_URL: ${{ secrets.MVN_URL }}
           MAVEN_USERNAME: ${{ secrets.MVN_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.MVN_TOKEN }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-        working-directory: ./keycloak-admin-ui/keycloak-theme
+        working-directory: ./keycloak-theme
         run: |
           mvn -nsu -B -Pgpg -Djboss.releases.repo.id=$MAVEN_ID -Djboss.releases.repo.url=${{ secrets.MVN_URL }} -Djboss.snapshots.repo.id=$MAVEN_ID -Djboss.snapshots.repo.url=${{ secrets.MVN_URL }} -DskipTests -DretryFailedDeploymentCount=10 -DautoReleaseAfterClose=true clean deploy
