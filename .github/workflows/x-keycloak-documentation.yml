@@ -26,19 +26,17 @@ jobs:
           distribution: 'temurin'
           java-version: 11
 
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v3.0.0
         with:
           repository: '${{ secrets.GH_ORG }}/keycloak-documentation'
           token: ${{ secrets.GH_TOKEN }}
-          path: keycloak-documentation
           ref: ${{ inputs.tag }}
 
-      - name: Build documentation
-        working-directory: ./keycloak-documentation
+      - name: Build
         run: mvn -nsu -B clean install -DskipTests -Dlatest
 
-      - name: Upload documentation
+      - name: Upload to GitHub Releases
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
@@ -48,4 +46,3 @@ jobs:
             gh release create ${{ inputs.tag }}
           fi
           gh release upload ${{ inputs.tag }} ./dist/target/keycloak-documentation-${{ inputs.version }}.zip
-        working-directory: ./keycloak-documentation

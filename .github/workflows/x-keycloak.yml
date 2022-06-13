@@ -41,26 +41,24 @@ jobs:
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v3.0.0
         with:
           repository: '${{ secrets.GH_ORG }}/keycloak'
           token: ${{ secrets.GH_TOKEN }}
-          path: keycloak
           ref: ${{ inputs.tag }}
 
-      - name: Deploy Keycloak
+      - name: Deploy to Maven
         env:
           MAVEN_ID: kc-rel-repository
           MAVEN_URL: ${{ secrets.MVN_URL }}
           MAVEN_USERNAME: ${{ secrets.MVN_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.MVN_TOKEN }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-        working-directory: ./keycloak
         run: |
-          mvn -s ./.github/mvn-rel-settings.xml -nsu -B -Pgpg,jboss-release,distribution-downloads -Djboss.releases.repo.id=$MAVEN_ID -Djboss.releases.repo.url=${{ secrets.MVN_URL }} -Djboss.snapshots.repo.id=$MAVEN_ID -Djboss.snapshots.repo.url=${{ secrets.MVN_URL }} -DskipTests -DskipTestsuite -DretryFailedDeploymentCount=10 -DautoReleaseAfterClose=true clean deploy
+          ./mvnw -s ./.github/mvn-rel-settings.xml -nsu -B -Pgpg,jboss-release,distribution-downloads -Djboss.releases.repo.id=$MAVEN_ID -Djboss.releases.repo.url=${{ secrets.MVN_URL }} -Djboss.snapshots.repo.id=$MAVEN_ID -Djboss.snapshots.repo.url=${{ secrets.MVN_URL }} -DskipTests -DskipTestsuite -DretryFailedDeploymentCount=10 -DautoReleaseAfterClose=true clean deploy
 
-      - name: Upload Keycloak release
+      - name: Upload to GitHub Releases
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
@@ -70,4 +68,3 @@ jobs:
             gh release create ${{ inputs.tag }}
           fi
           gh release upload ${{ inputs.tag }} ./distribution/downloads/target/${{ inputs.version }}/*
-        working-directory: ./keycloak
