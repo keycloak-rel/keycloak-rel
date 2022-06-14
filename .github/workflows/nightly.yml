@@ -227,7 +227,7 @@ jobs:
         run: |
           rm -rf kubernetes
           mkdir -p kubernetes
-          cp -r ../keycloak/operator/target/kubernetes/*.yml kubernetes
+          cp -r ../keycloak/operator/app/target/kubernetes/*.yml kubernetes
           
           git add .
           git commit -m "Automatic update"
