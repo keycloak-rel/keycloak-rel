@@ -197,7 +197,7 @@ jobs:
           password: ${{ secrets.QUAY_TOKEN }}
 
       - name: Build the operator Docker image
-        working-directory: keycloak/operator
+        working-directory: keycloak
         run: |
           echo "${{ steps.meta.outputs.tags }}" | xargs -I {} \
           mvn clean package \
