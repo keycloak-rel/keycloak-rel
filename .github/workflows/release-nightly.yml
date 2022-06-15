@@ -8,30 +8,13 @@ concurrency: keycloak-release
 jobs:
 
   create-tags:
-    name: Update tags
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        repository:
-          - keycloak
-          - keycloak-admin-ui
-          - keycloak-documentation
-          - keycloak-nodejs-admin-client
-
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-      with:
-        repository: '${{ secrets.GH_ORG }}/${{ matrix.repository }}'
-        token: ${{ secrets.GH_TOKEN }}
-        path: ${{ matrix.repository }}
-
-    - name: Push tag
-      working-directory: ${{ matrix.repository }}
-      run: |
-        git tag -f nightly
-        git push origin nightly --force
+    name: Create tags
+    uses: ./.github/workflows/x-create-tags.yml
+    with:
+      tag: nightly
+    secrets:
+      GH_ORG: ${{ secrets.GH_ORG }}
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
   keycloak-nodejs-admin:
     name: Keycloak Node.js Admin Client
