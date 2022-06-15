@@ -90,6 +90,23 @@ jobs:
       QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
       QUAY_TOKEN: ${{ secrets.QUAY_TOKEN }}
 
+  keycloak-operator:
+    name: Keycloak Operator
+    needs: [create-tags,keycloak-container]
+    uses: ./.github/workflows/x-keycloak-operator.yml
+    with:
+      version: 999-SNAPSHOT
+      tag: nightly
+    secrets:
+      GH_ORG: ${{ secrets.GH_ORG }}
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      MVN_URL: ${{ secrets.MVN_SNAPSHOTS_URL }}
+      MVN_USERNAME: ${{ secrets.MVN_USERNAME }}
+      MVN_TOKEN: ${{ secrets.MVN_TOKEN }}
+      QUAY_ORG: ${{ secrets.QUAY_ORG }}
+      QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
+      QUAY_TOKEN: ${{ secrets.QUAY_TOKEN }}
+
   keycloak-documentation:
     name: Keycloak Documentation
     needs: [create-tags]

@@ -1,0 +1,109 @@
+name: X Keycloak Operator
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+      tag:
+        required: true
+        type: string
+    secrets:
+      GH_ORG:
+        required: true
+      GH_TOKEN:
+        required: true
+      MVN_URL:
+        required: true
+      MVN_USERNAME:
+        required: true
+      MVN_TOKEN:
+        required: true
+      QUAY_ORG:
+        required: true
+      QUAY_USERNAME:
+        required: true
+      QUAY_TOKEN:
+        required: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup Java
+        uses: actions/setup-java@v3.0.0
+        with:
+          distribution: 'temurin'
+          java-version: 11
+
+      - name: Checkout Repository
+        uses: actions/checkout@v3.0.0
+        with:
+          repository: '${{ secrets.GH_ORG }}/keycloak'
+          token: ${{ secrets.GH_TOKEN }}
+          ref: ${{ inputs.tag }}
+          path: keycloak
+
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v1.2.0
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v1.6.0
+
+      - name: Container metadata
+        id: meta
+        uses: docker/metadata-action@v3.6.2
+        with:
+          images: quay.io/${{ secrets.QUAY_ORG }}/keycloak-operator
+          tags: |
+            type=raw,value=nightly,enable=${{ inputs.tag == 'nightly' }}
+            type=semver,pattern={{version}},value=${{ inputs.tag }},enable=${{ inputs.tag != 'nightly' }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ inputs.tag }},enable=${{ inputs.tag != 'nightly' }}
+
+      - name: Login to Quay
+        uses: docker/login-action@v1.14.1
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_TOKEN }}
+
+      - name: Build and push
+        env:
+          MAVEN_ID: kc-rel-repository
+          MAVEN_URL: ${{ secrets.MVN_URL }}
+          MAVEN_USERNAME: ${{ secrets.MVN_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.MVN_TOKEN }}
+        working-directory: keycloak
+        run: |
+          echo "${{ steps.meta.outputs.tags }}" | xargs -I {} \
+          ./mvnw clean package \
+              -s ./.github/mvn-rel-settings.xml \
+              -f operator/pom.xml \
+              -DskipTests \
+              -Dquarkus.container-image.image={} \
+              -Dquarkus.container-image.build=true \
+              -Dquarkus.container-image.push=true
+
+      - name: Clone k8s resources repository
+        uses: actions/checkout@v3.0.0
+        with:
+          repository: ${{ secrets.GH_ORG }}/keycloak-k8s-resources
+          path: keycloak-k8s-resources
+          token: ${{ secrets.GH_TOKEN }}
+
+      - name: Update k8s resources
+        working-directory: keycloak-k8s-resources
+        run: |
+          rm -rf kubernetes
+          mkdir -p kubernetes
+          cp -r ../keycloak/operator/app/target/kubernetes/*.yml kubernetes
+
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
+          git add .
+          git commit -m "Automatic update to ${{ inputs.tag }}"
+          git tag -f ${{ inputs.tag }}
+          git push origin ${{ inputs.tag }} --force
