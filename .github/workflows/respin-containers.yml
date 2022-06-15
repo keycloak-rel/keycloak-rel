@@ -1,0 +1,24 @@
+name: Re-spin Containers
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        required: true
+
+concurrency: keycloak-release
+
+jobs:
+
+  keycloak-container:
+    name: Keycloak Container
+    uses: ./.github/workflows/x-keycloak-container.yml
+    with:
+      version: ${{ github.event.inputs.version }}
+      tag: ${{ github.event.inputs.version }}
+    secrets:
+      GH_ORG: ${{ secrets.GH_ORG }}
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      QUAY_ORG: ${{ secrets.QUAY_ORG }}
+      QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
+      QUAY_TOKEN: ${{ secrets.QUAY_TOKEN }}
