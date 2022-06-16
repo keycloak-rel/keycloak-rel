@@ -2,9 +2,10 @@ name: Sync forks
 
 on:
   workflow_dispatch:
-    hard-reset:
-      type: boolean
-      default: false
+    inputs:
+      hard-reset:
+        type: boolean
+        default: false
 
 concurrency: rel-branches
 
@@ -42,7 +43,7 @@ jobs:
       working-directory: ${{ matrix.repository }}
 
     - name: Sync main branch from upstream
-      if: ! inputs.hard-reset
+      if: ( ! inputs.hard-reset )
       run: |
         git rebase upstream/main
         git push origin main:main
