@@ -3,7 +3,7 @@ name: Release Nightly
 on:
   workflow_dispatch:
 
-concurrency: rel-${{ github.ref }}
+concurrency: rel-nightly
 
 jobs:
 
