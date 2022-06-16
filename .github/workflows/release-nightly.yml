@@ -3,7 +3,7 @@ name: Release Nightly
 on:
   workflow_dispatch:
 
-concurrency: keycloak-release
+concurrency: rel-${{ github.ref }}
 
 jobs:
 

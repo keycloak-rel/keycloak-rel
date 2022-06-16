@@ -10,7 +10,7 @@ on:
         description: 'Confirm major.minor version'
         required: true
 
-concurrency: keycloak-release
+concurrency: rel-branches
 
 jobs:
 

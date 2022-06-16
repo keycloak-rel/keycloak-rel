@@ -7,7 +7,7 @@ on:
         description: 'Major.minor version (for example 18.0)'
         required: true
 
-concurrency: keycloak-release
+concurrency: rel-branches
 
 jobs:
 
