@@ -107,3 +107,14 @@ jobs:
     secrets:
       GH_ORG: ${{ secrets.GH_ORG }}
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+  keycloak-quickstarts:
+    name: Keycloak QuickStarts
+    needs: [create-tags,keycloak]
+    uses: ./.github/workflows/x-keycloak-quickstarts.yml
+    with:
+      tag: ${{ github.event.inputs.version }}
+      target-branch: latest
+    secrets:
+      GH_ORG: ${{ secrets.GH_ORG }}
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}

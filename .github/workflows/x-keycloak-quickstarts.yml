@@ -1,0 +1,33 @@
+name: X Keycloak QuickStarts
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        required: true
+        type: string
+      target-branch:
+        required: true
+        type: string
+    secrets:
+      GH_ORG:
+        required: true
+      GH_TOKEN:
+        required: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3.0.0
+        with:
+          repository: '${{ secrets.GH_ORG }}/keycloak-quickstarts'
+          token: ${{ secrets.GH_TOKEN }}
+          ref: ${{ inputs.tag }}
+
+      - name: Update branch
+        run: |
+          git switch -C ${{ inputs.target-branch }}
+          git push --force origin refs/heads/${{ inputs.target-branch }}
