@@ -3,7 +3,7 @@ name: Sync forks
 on:
   workflow_dispatch:
 
-concurrency: keycloak-release
+concurrency: rel-branches
 
 jobs:
 
