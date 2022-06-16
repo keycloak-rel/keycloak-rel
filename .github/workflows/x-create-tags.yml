@@ -52,6 +52,4 @@ jobs:
 
       - name: Push changes
         working-directory: ${{ matrix.repository }}
-        run:  |
-          git push origin ${{ inputs.branch }} --force
-          git push origin --force --tags
+        run: git push --force origin refs/tags/${{ inputs.tag }}

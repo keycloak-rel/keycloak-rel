@@ -2,6 +2,9 @@ name: Sync forks
 
 on:
   workflow_dispatch:
+    hard-reset:
+      type: boolean
+      default: false
 
 concurrency: rel-branches
 
@@ -32,10 +35,22 @@ jobs:
         path: ${{ matrix.repository }}
         ref: 'main'
 
-    - name: Sync main branch from upstream
+    - name: Add upstream
       run: |
         git remote add upstream https://github.com/keycloak/${{ matrix.repository }}.git
         git fetch upstream
+      working-directory: ${{ matrix.repository }}
+
+    - name: Sync main branch from upstream
+      if: ! inputs.hard-reset
+      run: |
         git rebase upstream/main
         git push origin main:main
+      working-directory: ${{ matrix.repository }}
+
+    - name: Reset main branch from upstream
+      if: inputs.hard-reset
+      run: |
+        git reset --hard upstream/main
+        git push --force origin main:main
       working-directory: ${{ matrix.repository }}
