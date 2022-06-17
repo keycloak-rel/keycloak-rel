@@ -24,6 +24,8 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
 
       - name: Download api-docs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           gh release -R ${{ secrets.GH_ORG }}/keycloak download ${{ inputs.version }} -p keycloak-api-docs-${{ inputs.version }}.zip
           unzip keycloak-api-docs-${{ inputs.version }}.zip
@@ -31,6 +33,8 @@ jobs:
           mv keycloak-api-docs-${{ inputs.version }} docs-api/${{ inputs.version }}
 
       - name: Download documentation
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           gh release -R ${{ secrets.GH_ORG }}/keycloak-documentation download ${{ inputs.version }} -p keycloak-documentation-${{ inputs.version }}.zip
           unzip keycloak-documentation-${{ inputs.version }}.zip
@@ -38,6 +42,8 @@ jobs:
           mv keycloak-documentation-${{ inputs.version }} docs/${{ inputs.version }}
 
       - name: Commit to repository
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
@@ -67,5 +73,6 @@ jobs:
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
 
-          git commit -a -m "Keycloak ${{ inputs.version }} release"
+          git add --all
+          git commit -m "Keycloak ${{ inputs.version }} release"
           git push origin main:main
