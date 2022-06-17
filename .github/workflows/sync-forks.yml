@@ -26,6 +26,8 @@ jobs:
           - keycloak-nodejs-connect
           - keycloak-operator
           - keycloak-quickstarts
+          - keycloak-web
+          - keycloak.github.io
 
     steps:
     - name: Checkout repository
