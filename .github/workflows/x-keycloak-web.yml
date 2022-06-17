@@ -1,0 +1,71 @@
+name: X Keycloak
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+    secrets:
+      GH_ORG:
+        required: true
+      GH_TOKEN:
+        required: true
+
+jobs:
+  upload-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3.0.0
+        with:
+          repository: '${{ secrets.GH_ORG }}/keycloak.github.io'
+          token: ${{ secrets.GH_TOKEN }}
+
+      - name: Download api-docs
+        run: |
+          gh release -R ${{ secrets.GH_ORG }}/keycloak download ${{ inputs.version }} -p keycloak-api-docs-${{ inputs.version }}.zip
+          unzip keycloak-api-docs-${{ inputs.version }}.zip
+          rm keycloak-api-docs-${{ inputs.version }}.zip
+          mv keycloak-api-docs-${{ inputs.version }} docs-api/${{ inputs.version }}
+
+      - name: Download documentation
+        run: |
+          gh release -R ${{ secrets.GH_ORG }}/keycloak-documentation download ${{ inputs.version }} -p keycloak-documentation-${{ inputs.version }}.zip
+          unzip keycloak-documentation-${{ inputs.version }}.zip
+          rm keycloak-documentation-${{ inputs.version }}.zip
+          mv keycloak-documentation-${{ inputs.version }} docs/${{ inputs.version }}
+
+      - name: Commit to repository
+        run: |
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
+          git add docs/${{ inputs.version }}
+          git add docs-api/${{ inputs.version }}
+
+          git commit -m "Documentation for ${{ inputs.version }}"
+          git push origin main:main
+
+  add-version:
+    runs-on: ubuntu-latest
+    needs: [upload-docs]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3.0.0
+        with:
+          repository: '${{ secrets.GH_ORG }}/keycloak-web'
+          token: ${{ secrets.GH_TOKEN }}
+
+      - name: Add version
+        run: ./add-version.sh ${{ inputs.version }}
+
+      - name: Commit to repository
+        run: |
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
+          git commit -a -m "Keycloak ${{ inputs.version }} release"
+          git push origin main:main
