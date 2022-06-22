@@ -61,10 +61,4 @@ jobs:
       - name: Upload to GitHub Releases
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: |
-          if [ ${{ inputs.tag }} == 'nightly' ]; then
-            gh release view nightly | grep 'asset:' | cut -f 2 | xargs -I '{}' gh release delete-asset nightly '{}' -y
-          else
-            gh release create ${{ inputs.tag }}
-          fi
-          gh release upload ${{ inputs.tag }} ./distribution/downloads/target/${{ inputs.version }}/*
+        run: gh release upload ${{ inputs.tag }} ./distribution/downloads/target/${{ inputs.version }}/*

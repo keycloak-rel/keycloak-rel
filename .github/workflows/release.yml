@@ -23,9 +23,20 @@ jobs:
       GH_ORG: ${{ secrets.GH_ORG }}
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
+  create-releases:
+    name: Create releases
+    needs: [create-tags]
+    uses: ./.github/workflows/x-create-releases.yml
+    with:
+      tag: ${{ github.event.inputs.version }}
+      prerelease: false
+    secrets:
+      GH_ORG: ${{ secrets.GH_ORG }}
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
   keycloak-nodejs-admin:
     name: Keycloak Node.js Admin Client
-    needs: [create-tags]
+    needs: [create-tags, create-releases]
     uses: ./.github/workflows/x-keycloak-nodejs-admin.yml
     with:
       version: ${{ github.event.inputs.version }}
@@ -52,7 +63,7 @@ jobs:
 
   keycloak:
     name: Keycloak
-    needs: [create-tags,keycloak-admin-console]
+    needs: [create-tags, create-releases, keycloak-admin-console]
     uses: ./.github/workflows/x-keycloak.yml
     with:
       version: ${{ github.event.inputs.version }}
@@ -99,7 +110,7 @@ jobs:
 
   keycloak-documentation:
     name: Keycloak Documentation
-    needs: [create-tags]
+    needs: [create-tags, create-releases]
     uses: ./.github/workflows/x-keycloak-documentation.yml
     with:
       version: ${{ github.event.inputs.version }}
@@ -115,6 +126,16 @@ jobs:
     with:
       tag: ${{ github.event.inputs.version }}
       target-branch: latest
+    secrets:
+      GH_ORG: ${{ secrets.GH_ORG }}
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+  publish-releases:
+    name: Publish releases
+    needs: [keycloak, keycloak-documentation, keycloak-nodejs-admin]
+    uses: ./.github/workflows/x-publish-releases.yml
+    with:
+      tag: ${{ github.event.inputs.version }}
     secrets:
       GH_ORG: ${{ secrets.GH_ORG }}
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
