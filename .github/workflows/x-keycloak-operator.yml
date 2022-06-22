@@ -69,22 +69,29 @@ jobs:
           username: ${{ secrets.QUAY_USERNAME }}
           password: ${{ secrets.QUAY_TOKEN }}
 
-      - name: Build and push
+      - name: Build
         env:
           MAVEN_ID: kc-rel-repository
           MAVEN_URL: ${{ secrets.MVN_URL }}
           MAVEN_USERNAME: ${{ secrets.MVN_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.MVN_TOKEN }}
         working-directory: keycloak
+        # hardcoded Quay.io image coordinates here are used only for building the K8s YAML resources (where we use Quay and not Docker Hub)
         run: |
-          echo "${{ steps.meta.outputs.tags }}" | xargs -I {} \
           ./mvnw clean package \
               -s ./.github/mvn-rel-settings.xml \
               -f operator/pom.xml \
               -DskipTests \
-              -Dquarkus.container-image.image={} \
+              -Dquarkus.container-image.image=quay.io/${{ secrets.QUAY_ORG }}/keycloak-operator:${{ inputs.tag }} \
               -Dquarkus.container-image.build=true \
-              -Dquarkus.container-image.push=true
+              -Dquarkus.jib.image-id-file=image-id.txt \
+              -Doperator.keycloak.image=quay.io/${{ secrets.QUAY_ORG }}/keycloak:${{ inputs.tag }}
+
+      - name: Tag and push the operator images
+        working-directory: keycloak
+        run: |
+          echo "${{ steps.meta.outputs.tags }}" | xargs -I {} \
+            sh -c "docker tag $(cat operator/app/target/image-id.txt) {} && docker push {}"
 
       - name: Clone k8s resources repository
         uses: actions/checkout@v3.0.0
