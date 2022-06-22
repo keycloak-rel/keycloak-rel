@@ -1,0 +1,45 @@
+name: X Create releases
+on:
+  workflow_call:
+    inputs:
+      tag:
+        required: true
+        type: string
+      prerelease:
+        required: false
+        type: boolean
+        default: true
+    secrets:
+      GH_ORG:
+        required: true
+      GH_TOKEN:
+        required: true
+jobs:
+  create-releases:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+    strategy:
+      matrix:
+        repository:
+          - keycloak
+          - keycloak-documentation
+          - keycloak-nodejs-admin-client
+    steps:
+      - name: Check if release exists
+        id: release-exists
+        run: >
+          echo ::set-output name=exists::$(
+            if ( gh release view ${{ inputs.tag }} --repo ${{ secrets.GH_ORG }}/${{ matrix.repository }} &> /dev/null ); then
+              echo 'true'
+            else
+              echo 'false'
+            fi
+          )
+
+      - name: Delete existing release
+        if: steps.release-exists.outputs.exists == 'true'
+        run: gh release delete ${{ inputs.tag }} --repo ${{ secrets.GH_ORG }}/${{ matrix.repository }} --yes
+
+      - name: Create a release
+        run: gh release create ${{ inputs.tag }} --repo ${{ secrets.GH_ORG }}/${{ matrix.repository }} --title ${{ inputs.tag }} --draft ${{ inputs.prerelease && '--prerelease' || '' }}

@@ -1,0 +1,26 @@
+name: X Publish releases
+on:
+  workflow_call:
+    inputs:
+      tag:
+        required: true
+        type: string
+    secrets:
+      GH_ORG:
+        required: true
+      GH_TOKEN:
+        required: true
+jobs:
+  publish-releases:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        repository:
+          - keycloak
+          - keycloak-documentation
+          - keycloak-nodejs-admin-client
+    steps:
+      - name: Publish release
+        run: gh release edit ${{ inputs.tag }} --repo ${{ secrets.GH_ORG }}/${{ matrix.repository }} --draft=false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
