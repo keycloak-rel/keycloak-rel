@@ -80,3 +80,67 @@ Once the changes have been tested a PR can be opened against the main branch in 
 Final step is syncing changes from the testing fork to the main release repository through a PR. This is generally not a step that you need to perform as a contributor, but rather a maintainer of the release process will coordinate this last step.
 
 Anyone that would like to make bigger changes to the release process, or are maintainers of certain parts of the release process get full access to the [keycloak-rel-testing](https://github.com/keycloak-rel-testing/) organization, but do not everyone gets access to the [main release organization]([keycloak-rel-testing](https://github.com/keycloak-rel/). The latter is intentionally very limited in the number of people that gets access to it.
+
+## Release artifacts
+
+### Tags
+
+Tag name is {version} (for example `19.0.0`), or `nightly` for nightly releases.
+
+|Repo|Main|Test|
+|----|----|----|
+|keycloak|https://github.com/keycloak/keycloak|https://github.com/keycloak-rel-testing/keycloak|
+|keycloak-admin-ui|https://github.com/keycloak/keycloak-admin-ui|https://github.com/keycloak-rel-testing/keycloak-admin-ui|
+|keycloak|https://github.com/keycloak/keycloak-documentation|https://github.com/keycloak-rel-testing/keycloak-documentation|
+|keycloak-nodejs-admin-client|https://github.com/keycloak/keycloak-nodejs-admin-client|https://github.com/keycloak-rel-testing/keycloak-nodejs-admin-client|
+|keycloak-quickstarts|https://github.com/keycloak/keycloak-quickstarts|https://github.com/keycloak-rel-testing/keycloak-quickstarts|
+
+## GitHub releases
+
+Release name is {version} (for example `19.0.0`), or `nightly` for nightly releases.
+
+|Repo|Main|Test|
+|----|----|----|
+|keycloak|https://github.com/keycloak/keycloak/releases|https://github.com/keycloak-rel-testing/keycloak/releases|
+|keycloak-documentation|https://github.com/keycloak/keycloak-documentation/releases|https://github.com/keycloak-rel-testing/keycloak-documentation/releases|
+|keycloak-nodejs-admin-client|https://github.com/keycloak/keycloak-nodejs-admin-client/releases|https://github.com/keycloak-rel-testing/keycloak-nodejs-admin-client/releases|
+
+## Maven
+
+Nightly releases uses `999-SNAPSHOT` version. Maven artifacts are currently published to GitHub Packages for test releases, but plan is to stop doing this and only upload to GitHub releases.
+
+|Main - Release|Main - Nightly|Test|
+|--------------|--------------|----|
+|https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/|https://s01.oss.sonatype.org/content/repositories/snapshots/|https://maven.pkg.github.com/keycloak-rel-testing/maven|
+
+## NPM
+
+NPM artifacts are uploaded to GitHub releases for the corresponding repository, and published to npm.js for non-test releases. 
+
+|Main|Test|
+|----|----|
+|https://www.npmjs.com/|Not published|
+
+## Containers
+
+Nightly release uses `nightly` tag.
+
+|Container|Main|Test|
+|---------|----|----|
+|Keycloak|https://quay.io/repository/keycloak/keycloak|https://quay.io/repository/keycloak/keycloak|https://quay.io/repository/keycloaktesting/keycloak|
+|Operator|https://quay.io/repository/keycloak/keycloak-operator|https://quay.io/repository/keycloak/keycloak|https://quay.io/repository/keycloaktesting/keycloak-operator|
+
+## K8s resources
+
+|Main|Test|
+|----|----|
+|https://github.com/keycloak/keycloak-k8s-resources|https://github.com/keycloak-rel-testing/keycloak-k8s-resources|
+
+## Website
+
+Main releases are published to https//www.keycloak.org as repositories are updated. Nightly or test releases are not published anywhere.
+
+|Repo|Main|Test|
+|----|----|----|
+|keycloak-web|https://github.com/keycloak/keycloak-web|https://github.com/keycloak-rel-testing/keycloak-web|
+|keycloak.github.io|https://github.com/keycloak/keycloak.github.io|https://github.com/keycloak-rel-testing/keycloak.github.io|
