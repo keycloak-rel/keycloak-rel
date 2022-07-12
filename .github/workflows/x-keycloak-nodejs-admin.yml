@@ -1,10 +1,9 @@
 name: X Keycloak Node.js Admin Client
-
 on:
   workflow_call:
     inputs:
       version:
-        required: true
+        required: false
         type: string
       tag:
         required: true
@@ -14,21 +13,42 @@ on:
         required: true
       GH_TOKEN:
         required: true
-
 jobs:
   release:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3.0.0
+        uses: actions/checkout@v3
         with:
-          repository: '${{ secrets.GH_ORG }}/keycloak-nodejs-admin-client'
+          repository: ${{ secrets.GH_ORG }}/keycloak-nodejs-admin-client
           token: ${{ secrets.GH_TOKEN }}
-          path: keycloak-nodejs-admin-client
           ref: ${{ inputs.tag }}
 
-      - name: Placeholder
-        working-directory: ./keycloak-nodejs-admin-client
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          check-latest: true
+          cache: npm
+
+      - name: Cache dependencies
+        id: cache-dependencies
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install dependencies
+        if: steps.cache-dependencies.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: Create package tarball
         run: |
-          echo 'Hello world!'
+          npm run prepublishOnly
+          npm pack
+          mv -T *.tgz keycloak-nodejs-admin-client.tgz
+
+      - name: Upload to GitHub Releases
+        run: gh release upload ${{ inputs.tag }} keycloak-nodejs-admin-client.tgz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}

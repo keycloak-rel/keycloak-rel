@@ -1,4 +1,4 @@
-name: X Create releases
+name: X Create Github releases
 on:
   workflow_call:
     inputs:
@@ -15,7 +15,7 @@ on:
       GH_TOKEN:
         required: true
 jobs:
-  create-releases:
+  create-gh-releases:
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
