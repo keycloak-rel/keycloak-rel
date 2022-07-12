@@ -1,4 +1,4 @@
-name: X Publish releases
+name: X Publish Github releases
 on:
   workflow_call:
     inputs:
@@ -11,7 +11,7 @@ on:
       GH_TOKEN:
         required: true
 jobs:
-  publish-releases:
+  publish-gh-releases:
     runs-on: ubuntu-latest
     strategy:
       matrix:

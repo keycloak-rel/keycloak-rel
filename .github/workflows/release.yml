@@ -23,10 +23,10 @@ jobs:
       GH_ORG: ${{ secrets.GH_ORG }}
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-  create-releases:
-    name: Create releases
+  create-gh-releases:
+    name: Create Github releases
     needs: [create-tags]
-    uses: ./.github/workflows/x-create-releases.yml
+    uses: ./.github/workflows/x-create-gh-releases.yml
     with:
       tag: ${{ github.event.inputs.version }}
       prerelease: false
@@ -36,11 +36,11 @@ jobs:
 
   keycloak-nodejs-admin:
     name: Keycloak Node.js Admin Client
-    needs: [create-tags, create-releases]
+    needs: [create-tags, create-gh-releases]
     uses: ./.github/workflows/x-keycloak-nodejs-admin.yml
     with:
-      version: ${{ github.event.inputs.version }}
       tag: ${{ github.event.inputs.version }}
+      version: ${{ github.event.inputs.version }}
     secrets:
       GH_ORG: ${{ secrets.GH_ORG }}
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -63,7 +63,7 @@ jobs:
 
   keycloak:
     name: Keycloak
-    needs: [create-tags, create-releases, keycloak-admin-console]
+    needs: [create-tags, create-gh-releases, keycloak-admin-console]
     uses: ./.github/workflows/x-keycloak.yml
     with:
       version: ${{ github.event.inputs.version }}
@@ -110,7 +110,7 @@ jobs:
 
   keycloak-documentation:
     name: Keycloak Documentation
-    needs: [create-tags, create-releases]
+    needs: [create-tags, create-gh-releases]
     uses: ./.github/workflows/x-keycloak-documentation.yml
     with:
       version: ${{ github.event.inputs.version }}
@@ -130,12 +130,23 @@ jobs:
       GH_ORG: ${{ secrets.GH_ORG }}
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-  publish-releases:
+  publish-gh-releases:
     name: Publish releases
     needs: [keycloak, keycloak-documentation, keycloak-nodejs-admin]
-    uses: ./.github/workflows/x-publish-releases.yml
+    uses: ./.github/workflows/x-publish-gh-releases.yml
     with:
       tag: ${{ github.event.inputs.version }}
     secrets:
       GH_ORG: ${{ secrets.GH_ORG }}
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+  publish-npm:
+    name: Publish NPM packages
+    needs: [keycloak-nodejs-admin]
+    uses: ./.github/workflows/x-publish-npm.yml
+    with:
+      tag: ${{ github.event.inputs.version }}
+    secrets:
+      GH_ORG: ${{ secrets.GH_ORG }}
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
