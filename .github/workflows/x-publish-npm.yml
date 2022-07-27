@@ -25,6 +25,7 @@ jobs:
         with:
           node-version: 16
           check-latest: true
+          registry-url: https://registry.npmjs.org
 
       - name: Download tarball
         run: gh release download ${{ inputs.tag }} --repo ${{ secrets.GH_ORG }}/${{ matrix.repository }}
