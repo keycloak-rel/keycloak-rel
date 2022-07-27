@@ -65,7 +65,10 @@ After the release has completed and it has been verified the release should be a
 4. version: `<full version>` (for example `19.0.0`)
 5. Click on `Run workflow`
 
-That's it folks!
+That's it folks! Well not quite, as not everything has been migrated to the new release process yet:
+
+* keycloak.js has to be published manually to NPM
+* keycloak-nodejs-connect, legacy containers and operator, need to be released with the legacy release process
 
 ## Contributing to the release process
 
