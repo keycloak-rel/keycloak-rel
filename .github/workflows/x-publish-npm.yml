@@ -32,6 +32,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Publish to NPM
-        run: npm publish ${{ matrix.repository }}.tgz --dry-run
+        run: npm publish ${{ matrix.repository }}.tgz
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
