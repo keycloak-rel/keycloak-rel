@@ -50,7 +50,7 @@ If you are doing a micro release (for example `19.0.1`, and not `19.0.0`) the ab
 
 Next step is to do the actual release:
 
-1. Navigate to the `Branch - Create Release` workflow
+1. Navigate to the `Release` workflow
 2. Click on `Run workflow`
 3. Use workflow from: `Branch: <release branch>` (for example `Branch: 19.0`)
 4. branch: `<release branch>` 
@@ -59,7 +59,7 @@ Next step is to do the actual release:
 
 After the release has completed and it has been verified the release should be announced:
 
-1. Navigate to the `Branch - Create Release` workflow
+1. Navigate to the `Announce Release` workflow
 2. Click on `Run workflow`
 3. Use workflow from: `Branch: <release branch>` (for example `Branch: 19.0`)
 4. version: `<full version>` (for example `19.0.0`)
