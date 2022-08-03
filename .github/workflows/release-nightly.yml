@@ -1,6 +1,8 @@
 name: Release Nightly
 
 on:
+  schedule:
+    - cron: '0 2 * * *'
   workflow_dispatch:
 
 concurrency: rel-nightly
@@ -8,6 +10,7 @@ concurrency: rel-nightly
 jobs:
 
   create-tags:
+    if: github.event_name != 'schedule' || github.repository_owner == 'keycloak-rel'
     name: Create tags
     uses: ./.github/workflows/x-create-tags.yml
     with:
