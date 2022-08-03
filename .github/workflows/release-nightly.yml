@@ -10,7 +10,7 @@ concurrency: rel-nightly
 jobs:
 
   create-tags:
-    if: github.repository_owner == 'keycloak-rel'
+    if: github.event_name != 'schedule' || github.repository_owner == 'keycloak-rel'
     name: Create tags
     uses: ./.github/workflows/x-create-tags.yml
     with:
