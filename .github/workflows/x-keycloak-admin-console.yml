@@ -57,4 +57,4 @@ jobs:
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         working-directory: ./keycloak-theme
         run: |
-          mvn -nsu -B -Pgpg -Djboss.releases.repo.id=$MAVEN_ID -Djboss.releases.repo.url=${{ secrets.MVN_URL }} -Djboss.snapshots.repo.id=$MAVEN_ID -Djboss.snapshots.repo.url=${{ secrets.MVN_URL }} -DskipTests -DretryFailedDeploymentCount=10 -DautoReleaseAfterClose=true clean deploy
+          mvn -nsu -B -Prelease,gpg -Djboss.releases.repo.id=$MAVEN_ID -Djboss.releases.repo.url=${{ secrets.MVN_URL }} -Djboss.snapshots.repo.id=$MAVEN_ID -Djboss.snapshots.repo.url=${{ secrets.MVN_URL }} -DskipTests -DretryFailedDeploymentCount=10 -DautoReleaseAfterClose=true clean deploy
