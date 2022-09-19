@@ -39,4 +39,4 @@ jobs:
       - name: Upload to GitHub Releases
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: gh release upload ${{ inputs.tag }} ./dist/target/keycloak-documentation-${{ inputs.version }}.zip
+        run: gh release upload --clobber ${{ inputs.tag }} ./dist/target/keycloak-documentation-${{ inputs.version }}.zip

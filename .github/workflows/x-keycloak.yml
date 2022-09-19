@@ -61,4 +61,4 @@ jobs:
       - name: Upload to GitHub Releases
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: gh release upload ${{ inputs.tag }} ./distribution/downloads/target/${{ inputs.version }}/*
+        run: gh release upload --clobber ${{ inputs.tag }} ./distribution/downloads/target/${{ inputs.version }}/*

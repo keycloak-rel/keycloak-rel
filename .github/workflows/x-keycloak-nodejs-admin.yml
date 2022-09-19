@@ -49,6 +49,6 @@ jobs:
           mv -T *.tgz keycloak-nodejs-admin-client.tgz
 
       - name: Upload to GitHub Releases
-        run: gh release upload ${{ inputs.tag }} keycloak-nodejs-admin-client.tgz
+        run: gh release upload --clobber ${{ inputs.tag }} keycloak-nodejs-admin-client.tgz
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
