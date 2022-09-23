@@ -3,6 +3,15 @@ name: X Keycloak Operator
 on:
   workflow_call:
     inputs:
+      gh-org:
+        required: true
+        type: string
+      quay-org:
+        required: true
+        type: string
+      mvn-url:
+        required: true
+        type: string
       version:
         required: true
         type: string
@@ -10,22 +19,20 @@ on:
         required: true
         type: string
     secrets:
-      GH_ORG:
-        required: true
       GH_TOKEN:
-        required: true
-      MVN_URL:
         required: true
       MVN_USERNAME:
         required: true
       MVN_TOKEN:
         required: true
-      QUAY_ORG:
-        required: true
       QUAY_USERNAME:
         required: true
       QUAY_TOKEN:
         required: true
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
   release:
@@ -41,7 +48,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3.0.0
         with:
-          repository: '${{ secrets.GH_ORG }}/keycloak'
+          repository: '${{ inputs.gh-org }}/keycloak'
           token: ${{ secrets.GH_TOKEN }}
           ref: ${{ inputs.tag }}
           path: keycloak
@@ -56,7 +63,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v3.6.2
         with:
-          images: quay.io/${{ secrets.QUAY_ORG }}/keycloak-operator
+          images: quay.io/${{ inputs.quay-org }}/keycloak-operator
           tags: |
             type=raw,value=nightly,enable=${{ inputs.tag == 'nightly' }}
             type=semver,pattern={{version}},value=${{ inputs.tag }},enable=${{ inputs.tag != 'nightly' }}
@@ -72,7 +79,7 @@ jobs:
       - name: Build
         env:
           MAVEN_ID: kc-rel-repository
-          MAVEN_URL: ${{ secrets.MVN_URL }}
+          MAVEN_URL: ${{ inputs.mvn-url }}
           MAVEN_USERNAME: ${{ secrets.MVN_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.MVN_TOKEN }}
         working-directory: keycloak
@@ -82,10 +89,10 @@ jobs:
               -s ./.github/mvn-rel-settings.xml \
               -f operator/pom.xml \
               -DskipTests \
-              -Dquarkus.container-image.image=quay.io/${{ secrets.QUAY_ORG }}/keycloak-operator:${{ inputs.tag }} \
+              -Dquarkus.container-image.image=quay.io/${{ inputs.quay-org }}/keycloak-operator:${{ inputs.tag }} \
               -Dquarkus.container-image.build=true \
               -Dquarkus.jib.image-id-file=image-id.txt \
-              -Doperator.keycloak.image=quay.io/${{ secrets.QUAY_ORG }}/keycloak:${{ inputs.tag }}
+              -Doperator.keycloak.image=quay.io/${{ inputs.quay-org }}/keycloak:${{ inputs.tag }}
 
       - name: Tag and push the operator images
         working-directory: keycloak
@@ -96,7 +103,7 @@ jobs:
       - name: Clone k8s resources repository
         uses: actions/checkout@v3.0.0
         with:
-          repository: ${{ secrets.GH_ORG }}/keycloak-k8s-resources
+          repository: ${{ inputs.gh-org }}/keycloak-k8s-resources
           path: keycloak-k8s-resources
           token: ${{ secrets.GH_TOKEN }}
 
@@ -114,3 +121,7 @@ jobs:
           git commit -m "Automatic update to ${{ inputs.tag }}"
           git tag -f ${{ inputs.tag }}
           git push origin ${{ inputs.tag }} --force
+
+      - name: Show Container tags
+        run: |
+          echo ${{ steps.meta.outputs.tags }} >> $GITHUB_STEP_SUMMARY

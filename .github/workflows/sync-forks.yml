@@ -9,11 +9,19 @@ on:
 
 concurrency: rel-branches
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
+
+  env:
+    uses: ./.github/workflows/x-env.yml
 
   sync-branches:
     name: Rebase from upstream
     runs-on: ubuntu-latest
+    needs: [env]
 
     strategy:
       matrix:
@@ -33,7 +41,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
       with:
-        repository: '${{ secrets.GH_ORG }}/${{ matrix.repository }}'
+        repository: '${{ inputs.gh-org }}/${{ matrix.repository }}'
         token: ${{ secrets.GH_TOKEN }}
         path: ${{ matrix.repository }}
         ref: 'main'

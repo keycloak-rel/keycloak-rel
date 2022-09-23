@@ -12,11 +12,19 @@ on:
 
 concurrency: rel-branches
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
+
+  env:
+    uses: ./.github/workflows/x-env.yml
 
   create-branch:
     name: Create branch
     runs-on: ubuntu-latest
+    needs: [env]
     if: ${{ github.event.inputs.majorMinorVersion == github.event.inputs.majorMinorVersionConfirmation }}
     continue-on-error: true
 
@@ -36,7 +44,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          repository: '${{ secrets.GH_ORG }}/${{ matrix.repository }}'
+          repository: '${{ needs.env.outputs.gh-org }}/${{ matrix.repository }}'
           token: ${{ secrets.GH_TOKEN }}
           path: ${{ matrix.repository }}
 

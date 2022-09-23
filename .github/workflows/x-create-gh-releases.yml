@@ -1,7 +1,11 @@
 name: X Create Github releases
+
 on:
   workflow_call:
     inputs:
+      gh-org:
+        required: true
+        type: string
       tag:
         required: true
         type: string
@@ -10,10 +14,13 @@ on:
         type: boolean
         default: true
     secrets:
-      GH_ORG:
-        required: true
       GH_TOKEN:
         required: true
+
+defaults:
+  run:
+    shell: bash
+
 jobs:
   create-gh-releases:
     runs-on: ubuntu-latest
@@ -30,7 +37,7 @@ jobs:
         id: release-exists
         run: >
           echo ::set-output name=exists::$(
-            if ( gh release view ${{ inputs.tag }} --repo ${{ secrets.GH_ORG }}/${{ matrix.repository }} &> /dev/null ); then
+            if ( gh release view ${{ inputs.tag }} --repo ${{ inputs.gh-org }}/${{ matrix.repository }} &> /dev/null ); then
               echo 'true'
             else
               echo 'false'
@@ -39,7 +46,7 @@ jobs:
 
       - name: Delete existing release
         if: steps.release-exists.outputs.exists == 'true'
-        run: gh release delete ${{ inputs.tag }} --repo ${{ secrets.GH_ORG }}/${{ matrix.repository }} --yes
+        run: gh release delete ${{ inputs.tag }} --repo ${{ inputs.gh-org }}/${{ matrix.repository }} --yes
 
       - name: Create a release
-        run: gh release create ${{ inputs.tag }} --repo ${{ secrets.GH_ORG }}/${{ matrix.repository }} --title ${{ inputs.tag }} --draft ${{ inputs.prerelease && '--prerelease' || '' }}
+        run: gh release create ${{ inputs.tag }} --repo ${{ inputs.gh-org }}/${{ matrix.repository }} --title ${{ inputs.tag }} --draft ${{ inputs.prerelease && '--prerelease' || '' }}

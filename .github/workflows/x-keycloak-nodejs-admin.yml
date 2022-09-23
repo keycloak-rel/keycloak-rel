@@ -1,7 +1,11 @@
 name: X Keycloak Node.js Admin Client
+
 on:
   workflow_call:
     inputs:
+      gh-org:
+        required: true
+        type: string
       version:
         required: false
         type: string
@@ -9,10 +13,13 @@ on:
         required: true
         type: string
     secrets:
-      GH_ORG:
-        required: true
       GH_TOKEN:
         required: true
+
+defaults:
+  run:
+    shell: bash
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -20,7 +27,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          repository: ${{ secrets.GH_ORG }}/keycloak-nodejs-admin-client
+          repository: ${{ inputs.gh-org }}/keycloak-nodejs-admin-client
           token: ${{ secrets.GH_TOKEN }}
           ref: ${{ inputs.tag }}
 

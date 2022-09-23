@@ -3,14 +3,19 @@ name: X Keycloak
 on:
   workflow_call:
     inputs:
+      gh-org:
+        required: true
+        type: string
       version:
         required: true
         type: string
     secrets:
-      GH_ORG:
-        required: true
       GH_TOKEN:
         required: true
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
   upload-docs:
@@ -20,14 +25,14 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3.0.0
         with:
-          repository: '${{ secrets.GH_ORG }}/keycloak.github.io'
+          repository: '${{ inputs.gh-org }}/keycloak.github.io'
           token: ${{ secrets.GH_TOKEN }}
 
       - name: Download api-docs
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          gh release -R ${{ secrets.GH_ORG }}/keycloak download ${{ inputs.version }} -p keycloak-api-docs-${{ inputs.version }}.zip
+          gh release -R ${{ inputs.gh-org }}/keycloak download ${{ inputs.version }} -p keycloak-api-docs-${{ inputs.version }}.zip
           unzip keycloak-api-docs-${{ inputs.version }}.zip
           rm keycloak-api-docs-${{ inputs.version }}.zip
           mv keycloak-api-docs-${{ inputs.version }} docs-api/${{ inputs.version }}
@@ -36,7 +41,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          gh release -R ${{ secrets.GH_ORG }}/keycloak-documentation download ${{ inputs.version }} -p keycloak-documentation-${{ inputs.version }}.zip
+          gh release -R ${{ inputs.gh-org }}/keycloak-documentation download ${{ inputs.version }} -p keycloak-documentation-${{ inputs.version }}.zip
           unzip keycloak-documentation-${{ inputs.version }}.zip
           rm keycloak-documentation-${{ inputs.version }}.zip
           mv keycloak-documentation-${{ inputs.version }} docs/${{ inputs.version }}
@@ -62,7 +67,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3.0.0
         with:
-          repository: '${{ secrets.GH_ORG }}/keycloak-web'
+          repository: '${{ inputs.gh-org }}/keycloak-web'
           token: ${{ secrets.GH_TOKEN }}
 
       - name: Add version

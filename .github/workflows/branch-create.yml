@@ -9,11 +9,19 @@ on:
 
 concurrency: rel-branches
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
+
+  env:
+    uses: ./.github/workflows/x-env.yml
 
   create-branch:
     name: Create branch
     runs-on: ubuntu-latest
+    needs: [env]
 
     strategy:
       matrix:
@@ -31,7 +39,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
       with:
-        repository: '${{ secrets.GH_ORG }}/${{ matrix.repository }}'
+        repository: '${{ needs.env.outputs.gh-org }}/${{ matrix.repository }}'
         ref: 'main'
         token: ${{ secrets.GH_TOKEN }}
         path: ${{ matrix.repository }}
