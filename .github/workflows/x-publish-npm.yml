@@ -1,17 +1,24 @@
 name: X Publish NPM packages
+
 on:
   workflow_call:
     inputs:
+      gh-org:
+        required: true
+        type: string
       tag:
         required: true
         type: string
     secrets:
-      GH_ORG:
-        required: true
       GH_TOKEN:
         required: true
       NPM_TOKEN:
         required: true
+
+defaults:
+  run:
+    shell: bash
+
 jobs:
   publish-npm:
     runs-on: ubuntu-latest
@@ -28,7 +35,7 @@ jobs:
           registry-url: https://registry.npmjs.org
 
       - name: Download tarball
-        run: gh release download ${{ inputs.tag }} --repo ${{ secrets.GH_ORG }}/${{ matrix.repository }}
+        run: gh release download ${{ inputs.tag }} --repo ${{ inputs.gh-org }}/${{ matrix.repository }}
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
@@ -36,3 +43,11 @@ jobs:
         run: npm publish ${{ matrix.repository }}.tgz
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  list-npm:
+    name: Show NPM packages
+    runs-on: ubuntu-latest
+    needs: [publish-npm]
+    steps:
+      - run: |
+          echo "https://www.npmjs.com/package/@keycloak/keycloak-admin-client/v/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY

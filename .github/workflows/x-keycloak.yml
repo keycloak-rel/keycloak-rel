@@ -3,6 +3,12 @@ name: X Keycloak
 on:
   workflow_call:
     inputs:
+      gh-org:
+        required: true
+        type: string
+      mvn-url:
+        required: true
+        type: string
       version:
         required: true
         type: string
@@ -10,11 +16,7 @@ on:
         required: true
         type: string
     secrets:
-      GH_ORG:
-        required: true
       GH_TOKEN:
-        required: true
-      MVN_URL:
         required: true
       MVN_USERNAME:
         required: true
@@ -24,6 +26,10 @@ on:
         required: true
       GPG_PRIVATE_KEY:
         required: true
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
   release:
@@ -44,21 +50,29 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3.0.0
         with:
-          repository: '${{ secrets.GH_ORG }}/keycloak'
+          repository: '${{ inputs.gh-org }}/keycloak'
           token: ${{ secrets.GH_TOKEN }}
           ref: ${{ inputs.tag }}
 
       - name: Deploy to Maven
         env:
           MAVEN_ID: kc-rel-repository
-          MAVEN_URL: ${{ secrets.MVN_URL }}
+          MAVEN_URL: ${{ inputs.mvn-url }}
           MAVEN_USERNAME: ${{ secrets.MVN_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.MVN_TOKEN }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
-          ./mvnw -s ./.github/mvn-rel-settings.xml -nsu -B -Pgpg,jboss-release,distribution-downloads -Djboss.releases.repo.id=$MAVEN_ID -Djboss.releases.repo.url=${{ secrets.MVN_URL }} -Djboss.snapshots.repo.id=$MAVEN_ID -Djboss.snapshots.repo.url=${{ secrets.MVN_URL }} -DskipTests -DskipTestsuite -DretryFailedDeploymentCount=10 -DautoReleaseAfterClose=true clean deploy
+          ./mvnw -s ./.github/mvn-rel-settings.xml -nsu -B -Pgpg,jboss-release,distribution-downloads -Djboss.releases.repo.id=$MAVEN_ID -Djboss.releases.repo.url=${{ inputs.mvn-url }} -Djboss.snapshots.repo.id=$MAVEN_ID -Djboss.snapshots.repo.url=${{ inputs.mvn-url }} -DskipTests -DskipTestsuite -DretryFailedDeploymentCount=10 -DautoReleaseAfterClose=true clean deploy | tee deploy.log
+
+      - name: Show Maven artifacts
+        run: |
+          cat deploy.log | grep "Uploaded to" | grep -o "https://[^ ]*" | grep -v '.xml$' | grep -v '.asc$' | grep -v '.pom$' | grep -v 'javadoc.jar$' | grep -v 'sources.jar$' | xargs -I {} echo "{}  " >> $GITHUB_STEP_SUMMARY
 
       - name: Upload to GitHub Releases
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: gh release upload ${{ inputs.tag }} ./distribution/downloads/target/${{ inputs.version }}/*
+
+      - name: Show GitHub Release artifacts
+        run: |
+          ls ./distribution/downloads/target/${{ inputs.version }}/ | grep -v '.md5$' | grep -v '.sha1$' | sort | xargs -I {} echo "https://github.com/keycloak/keycloak/releases/download/${{ inputs.version }}/{}  " >> $GITHUB_STEP_SUMMARY

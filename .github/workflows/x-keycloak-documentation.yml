@@ -3,6 +3,9 @@ name: X Keycloak Documentation
 on:
   workflow_call:
     inputs:
+      gh-org:
+        required: true
+        type: string
       version:
         required: true
         type: string
@@ -10,10 +13,12 @@ on:
         required: true
         type: string
     secrets:
-      GH_ORG:
-        required: true
       GH_TOKEN:
         required: true
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
   release:
@@ -29,7 +34,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3.0.0
         with:
-          repository: '${{ secrets.GH_ORG }}/keycloak-documentation'
+          repository: '${{ inputs.gh-org }}/keycloak-documentation'
           token: ${{ secrets.GH_TOKEN }}
           ref: ${{ inputs.tag }}
 
@@ -40,3 +45,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: gh release upload ${{ inputs.tag }} ./dist/target/keycloak-documentation-${{ inputs.version }}.zip
+
+      - name: Show GitHub Release artifacts
+        run: |
+          echo https://github.com/${{ inputs.gh-org }}/keycloak-documentation/releases/download/${{ inputs.version }}/keycloak-documentation-${{ inputs.version }}.zip >> $GITHUB_STEP_SUMMARY

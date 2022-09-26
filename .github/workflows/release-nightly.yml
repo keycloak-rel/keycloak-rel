@@ -9,47 +9,51 @@ concurrency: rel-nightly
 
 jobs:
 
-  create-tags:
+  env:
     if: github.event_name != 'schedule' || github.repository_owner == 'keycloak-rel'
+    uses: ./.github/workflows/x-env.yml
+
+  create-tags:
     name: Create tags
+    needs: [env]
     uses: ./.github/workflows/x-create-tags.yml
     with:
+      gh-org: ${{ needs.env.outputs.gh-org }}
       tag: nightly
     secrets:
-      GH_ORG: ${{ secrets.GH_ORG }}
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
   create-gh-releases:
     name: Create Github releases
-    needs: [create-tags]
+    needs: [env, create-tags]
     uses: ./.github/workflows/x-create-gh-releases.yml
     with:
+      gh-org: ${{ needs.env.outputs.gh-org }}
       tag: nightly
     secrets:
-      GH_ORG: ${{ secrets.GH_ORG }}
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
   keycloak-nodejs-admin:
     name: Keycloak Node.js Admin Client
-    needs: [create-tags, create-gh-releases]
+    needs: [env, create-tags, create-gh-releases]
     uses: ./.github/workflows/x-keycloak-nodejs-admin.yml
     with:
+      gh-org: ${{ needs.env.outputs.gh-org }}
       tag: nightly
     secrets:
-      GH_ORG: ${{ secrets.GH_ORG }}
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
   keycloak-admin-console:
     name: Keycloak Admin Console
-    needs: [create-tags,keycloak-nodejs-admin]
+    needs: [env, create-tags, keycloak-nodejs-admin]
     uses: ./.github/workflows/x-keycloak-admin-console.yml
     with:
+      gh-org: ${{ needs.env.outputs.gh-org }}
+      mvn-url: ${{ needs.env.outputs.mvn-snapshots-url }}
       version: 999-SNAPSHOT
       tag: nightly
     secrets:
-      GH_ORG: ${{ secrets.GH_ORG }}
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      MVN_URL: ${{ secrets.MVN_SNAPSHOTS_URL }}
       MVN_USERNAME: ${{ secrets.MVN_USERNAME }}
       MVN_TOKEN: ${{ secrets.MVN_TOKEN }}
       GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
@@ -57,15 +61,15 @@ jobs:
 
   keycloak:
     name: Keycloak
-    needs: [create-tags, create-gh-releases, keycloak-admin-console]
+    needs: [env, create-tags, create-gh-releases, keycloak-admin-console]
     uses: ./.github/workflows/x-keycloak.yml
     with:
+      gh-org: ${{ needs.env.outputs.gh-org }}
+      mvn-url: ${{ needs.env.outputs.mvn-snapshots-url }}
       version: 999-SNAPSHOT
       tag: nightly
     secrets:
-      GH_ORG: ${{ secrets.GH_ORG }}
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      MVN_URL: ${{ secrets.MVN_SNAPSHOTS_URL }}
       MVN_USERNAME: ${{ secrets.MVN_USERNAME }}
       MVN_TOKEN: ${{ secrets.MVN_TOKEN }}
       GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
@@ -73,63 +77,63 @@ jobs:
 
   keycloak-container:
     name: Keycloak Container
-    needs: [create-tags,keycloak]
+    needs: [env, create-tags, keycloak]
     uses: ./.github/workflows/x-keycloak-container.yml
     with:
+      gh-org: ${{ needs.env.outputs.gh-org }}
+      quay-org: ${{ needs.env.outputs.quay-org }}
       version: 999-SNAPSHOT
       tag: nightly
     secrets:
-      GH_ORG: ${{ secrets.GH_ORG }}
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      QUAY_ORG: ${{ secrets.QUAY_ORG }}
       QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
       QUAY_TOKEN: ${{ secrets.QUAY_TOKEN }}
 
   keycloak-operator:
     name: Keycloak Operator
-    needs: [create-tags,keycloak-container]
+    needs: [env, create-tags,keycloak-container]
     uses: ./.github/workflows/x-keycloak-operator.yml
     with:
+      gh-org: ${{ needs.env.outputs.gh-org }}
+      quay-org: ${{ needs.env.outputs.quay-org }}
+      mvn-url: ${{ needs.env.outputs.mvn-snapshots-url }}
       version: 999-SNAPSHOT
       tag: nightly
     secrets:
-      GH_ORG: ${{ secrets.GH_ORG }}
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      MVN_URL: ${{ secrets.MVN_SNAPSHOTS_URL }}
       MVN_USERNAME: ${{ secrets.MVN_USERNAME }}
       MVN_TOKEN: ${{ secrets.MVN_TOKEN }}
-      QUAY_ORG: ${{ secrets.QUAY_ORG }}
       QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
       QUAY_TOKEN: ${{ secrets.QUAY_TOKEN }}
 
   keycloak-documentation:
     name: Keycloak Documentation
-    needs: [create-tags, create-gh-releases]
+    needs: [env, create-tags, create-gh-releases]
     uses: ./.github/workflows/x-keycloak-documentation.yml
     with:
+      gh-org: ${{ needs.env.outputs.gh-org }}
       version: 999-SNAPSHOT
       tag: nightly
     secrets:
-      GH_ORG: ${{ secrets.GH_ORG }}
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
   keycloak-quickstarts:
     name: Keycloak QuickStarts
-    needs: [create-tags,keycloak]
+    needs: [env, create-tags, keycloak]
     uses: ./.github/workflows/x-keycloak-quickstarts.yml
     with:
+      gh-org: ${{ needs.env.outputs.gh-org }}
       tag: nightly
       target-branch: nightly
     secrets:
-      GH_ORG: ${{ secrets.GH_ORG }}
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
   publish-gh-releases:
     name: Publish releases
-    needs: [keycloak, keycloak-documentation, keycloak-nodejs-admin]
+    needs: [env, keycloak, keycloak-documentation, keycloak-nodejs-admin, keycloak-admin-console]
     uses: ./.github/workflows/x-publish-gh-releases.yml
     with:
+      gh-org: ${{ needs.env.outputs.gh-org }}
       tag: nightly
     secrets:
-      GH_ORG: ${{ secrets.GH_ORG }}
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
