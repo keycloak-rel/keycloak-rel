@@ -10,6 +10,7 @@ concurrency: rel-nightly
 jobs:
 
   env:
+    if: github.event_name != 'schedule' || github.repository_owner == 'keycloak-rel'
     uses: ./.github/workflows/x-env.yml
 
   create-tags:
