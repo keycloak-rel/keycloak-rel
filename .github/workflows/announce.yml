@@ -10,6 +10,12 @@ concurrency: rel-${{ github.ref }}
 
 jobs:
 
+  show-inputs:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "Version: ${{ inputs.version }}  " >> $GITHUB_STEP_SUMMARY
+
   env:
     uses: ./.github/workflows/x-env.yml
 
@@ -18,7 +24,7 @@ jobs:
     uses: ./.github/workflows/x-keycloak-web.yml
     needs: [env]
     with:
-      gh-org: ${{ steps.load-env.outputs.gh-org }}
+      gh-org: ${{ needs.env.outputs.gh-org }}
       version: ${{ github.event.inputs.version }}
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
