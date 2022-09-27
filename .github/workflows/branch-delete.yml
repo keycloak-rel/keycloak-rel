@@ -21,7 +21,8 @@ jobs:
   show-inputs:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Major.minor version: ${{ inputs.majorMinorVersion }}  " >> $GITHUB_STEP_SUMMARY
+      - run: |
+          echo "Major.minor version: ${{ inputs.majorMinorVersion }}  " >> $GITHUB_STEP_SUMMARY
 
   env:
     uses: ./.github/workflows/x-env.yml
