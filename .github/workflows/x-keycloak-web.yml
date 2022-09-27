@@ -46,6 +46,9 @@ jobs:
           rm keycloak-documentation-${{ inputs.version }}.zip
           mv keycloak-documentation-${{ inputs.version }} docs/${{ inputs.version }}
 
+          cd docs
+          rm -rf latest
+          ln -s ${{ inputs.version }} latest
       - name: Commit to repository
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -54,6 +57,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
 
           git add docs/${{ inputs.version }}
+          git add docs/latest
           git add docs-api/${{ inputs.version }}
 
           git commit -m "Documentation for ${{ inputs.version }}"
