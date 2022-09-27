@@ -44,7 +44,12 @@ jobs:
       - name: Upload to GitHub Releases
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: gh release upload ${{ inputs.tag }} ./dist/target/keycloak-documentation-${{ inputs.version }}.zip
+        run: |
+          cd ./dist/target
+          for i in `gh release view ${{ inputs.tag }} --json assets --jq '.assets[].name'`; do 
+            test -f $i || gh release delete-asset ${{ inputs.tag }} $i -y
+          done
+          gh release upload ${{ inputs.tag }} keycloak-documentation-${{ inputs.version }}.zip --clobber
 
       - name: Show GitHub Release artifacts
         run: |
