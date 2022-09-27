@@ -44,9 +44,6 @@ jobs:
             fi
           )
 
-      - name: Delete existing release
-        if: steps.release-exists.outputs.exists == 'true'
-        run: gh release delete ${{ inputs.tag }} --repo ${{ inputs.gh-org }}/${{ matrix.repository }} --yes
-
       - name: Create a release
+        if: steps.release-exists.outputs.exists == 'false'
         run: gh release create ${{ inputs.tag }} --repo ${{ inputs.gh-org }}/${{ matrix.repository }} --title ${{ inputs.tag }} --draft ${{ inputs.prerelease && '--prerelease' || '' }}

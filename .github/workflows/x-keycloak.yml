@@ -71,7 +71,12 @@ jobs:
       - name: Upload to GitHub Releases
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: gh release upload ${{ inputs.tag }} ./distribution/downloads/target/${{ inputs.version }}/*
+        run: |
+          cd ./distribution/downloads/target
+          for i in `gh release view ${{ inputs.tag }} --json assets --jq '.assets[].name'`; do 
+            test -f $i || gh release delete-asset ${{ inputs.tag }} $i -y 
+          done
+          gh release upload ${{ inputs.tag }} ${{ inputs.version }}/* --clobber
 
       - name: Show GitHub Release artifacts
         run: |
