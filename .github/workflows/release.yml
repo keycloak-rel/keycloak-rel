@@ -23,6 +23,7 @@ jobs:
       - run: |
           echo "Version: ${{ inputs.version }}  " >> $GITHUB_STEP_SUMMARY
           echo "Release branch: ${{ inputs.branch }}  " >> $GITHUB_STEP_SUMMARY
+          echo "Workflow branch: ${{ github.ref_name }}  " >> $GITHUB_STEP_SUMMARY
 
   env:
     uses: ./.github/workflows/x-env.yml

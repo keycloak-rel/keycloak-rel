@@ -9,6 +9,13 @@ concurrency: rel-nightly
 
 jobs:
 
+  show-inputs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: |
+          echo "Workflow branch: ${{ github.ref_name }}  " >> $GITHUB_STEP_SUMMARY
+
   env:
     if: github.event_name != 'schedule' || github.repository_owner == 'keycloak-rel'
     uses: ./.github/workflows/x-env.yml
