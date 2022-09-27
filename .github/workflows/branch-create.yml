@@ -33,7 +33,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           path: keycloak-rel
-          ref: 'main'
+          ref: main
       - name: Push release branch
         run: git push origin main:${{ github.event.inputs.majorMinorVersion }}
         working-directory: keycloak-rel
