@@ -18,14 +18,36 @@ defaults:
 
 jobs:
 
+  show-inputs:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "Major.minor version: ${{ inputs.majorMinorVersion }}  " >> $GITHUB_STEP_SUMMARY
+
   env:
     uses: ./.github/workflows/x-env.yml
 
-  create-branch:
-    name: Create branch
+  delete-workflow-branch:
+    name: Delete workflow branch
     runs-on: ubuntu-latest
     needs: [env]
-    if: ${{ github.event.inputs.majorMinorVersion == github.event.inputs.majorMinorVersionConfirmation }}
+    if: github.event.inputs.majorMinorVersion != 'main' && github.event.inputs.majorMinorVersion == github.event.inputs.majorMinorVersionConfirmation
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          path: keycloak-rel
+          ref: 'main'
+      - name: Push release branch
+        run: git push origin :${{ github.event.inputs.majorMinorVersion }}
+        working-directory: keycloak-rel
+
+  delete-release-branches:
+    name: Delete release branch
+    runs-on: ubuntu-latest
+    needs: [env]
+    if: github.event.inputs.majorMinorVersion != 'main' && github.event.inputs.majorMinorVersion == github.event.inputs.majorMinorVersionConfirmation
     continue-on-error: true
 
     strategy:

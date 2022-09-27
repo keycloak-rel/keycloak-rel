@@ -15,11 +15,32 @@ defaults:
 
 jobs:
 
+  show-inputs:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "Major.minor version: ${{ inputs.majorMinorVersion }}  " >> $GITHUB_STEP_SUMMARY
+
   env:
     uses: ./.github/workflows/x-env.yml
 
-  create-branch:
-    name: Create branch
+  create-workflow-branch:
+    name: Create workflow branch
+    runs-on: ubuntu-latest
+    needs: [env]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          path: keycloak-rel
+          ref: 'main'
+      - name: Push release branch
+        run: git push origin main:${{ github.event.inputs.majorMinorVersion }}
+        working-directory: keycloak-rel
+
+  create-release-branches:
+    name: Create release branch
     runs-on: ubuntu-latest
     needs: [env]
 
