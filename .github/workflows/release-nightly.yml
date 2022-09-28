@@ -88,12 +88,15 @@ jobs:
     with:
       gh-org: ${{ needs.env.outputs.gh-org }}
       quay-org: ${{ needs.env.outputs.quay-org }}
+      docker-org: ${{ needs.env.outputs.docker-org }}
       version: 999-SNAPSHOT
       tag: nightly
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
       QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
       QUAY_TOKEN: ${{ secrets.QUAY_TOKEN }}
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
 
   keycloak-operator:
     name: Keycloak Operator
@@ -102,6 +105,7 @@ jobs:
     with:
       gh-org: ${{ needs.env.outputs.gh-org }}
       quay-org: ${{ needs.env.outputs.quay-org }}
+      docker-org: ${{ needs.env.outputs.docker-org }}
       mvn-url: ${{ needs.env.outputs.mvn-snapshots-url }}
       version: 999-SNAPSHOT
       tag: nightly
@@ -111,6 +115,8 @@ jobs:
       MVN_TOKEN: ${{ secrets.MVN_TOKEN }}
       QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
       QUAY_TOKEN: ${{ secrets.QUAY_TOKEN }}
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
 
   keycloak-documentation:
     name: Keycloak Documentation

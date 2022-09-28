@@ -4,7 +4,15 @@ on:
   workflow_dispatch:
     inputs:
       version:
+        description: 'The version to respin'
         required: true
+      repository:
+        description: 'The container repository to respin'
+        required: true
+        type: choice
+        options:
+          - keycloak
+          - keycloak-operator
 
 concurrency: rel-${{ github.ref }}
 
@@ -13,16 +21,75 @@ jobs:
   env:
     uses: ./.github/workflows/x-env.yml
 
+  respin-number:
+    runs-on: ubuntu-latest
+    needs: [env]
+    outputs:
+      respin: ${{ steps.get-respin.outputs.respin }}
+    steps:
+      - id: get-respin
+        run: |
+          VERSION="${{ inputs.version }}"
+          RESPIN=0
+          VERSIONS=(`curl -L -s 'https://hub.docker.com/v2/repositories/${{ needs.env.outputs.docker-org }}/${{ inputs.repository }}/tags/?page_size=100' | jq -r .results[].name`)
+        
+          echo "Versions: ${VERSIONS[*]}"
+          
+          while [[ " ${VERSIONS[@]} " =~ "$VERSION-$RESPIN" ]]; do
+          echo "* $VERSION-$RESPIN exists"
+          RESPIN=$((RESPIN+1))
+          done
+          
+          echo ""
+          echo "Using: $VERSION-$RESPIN"
+          echo "::set-output name=respin::$RESPIN"
+
+  show-inputs:
+    runs-on: ubuntu-latest
+    needs: [respin-number]
+    steps:
+      - run: |
+          echo "Repository: ${{ inputs.repository }}  " >> $GITHUB_STEP_SUMMARY
+          echo "Version: ${{ inputs.version }}  " >> $GITHUB_STEP_SUMMARY
+          echo "Respin: ${{ needs.respin-number.outputs.respin }}" >> $GITHUB_STEP_SUMMARY
+
   keycloak-container:
     name: Keycloak Container
     uses: ./.github/workflows/x-keycloak-container.yml
-    needs: [env]
+    needs: [env, respin-number]
+    if: inputs.repository == 'keycloak'
     with:
       gh-org: ${{ needs.env.outputs.gh-org }}
       quay-org: ${{ needs.env.outputs.quay-org }}
+      docker-org: ${{ needs.env.outputs.docker-org }}
       version: ${{ github.event.inputs.version }}
       tag: ${{ github.event.inputs.version }}
+      respin: ${{ needs.respin-number.outputs.respin }}
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
       QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
       QUAY_TOKEN: ${{ secrets.QUAY_TOKEN }}
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+
+  keycloak-operator:
+    name: Keycloak Operator
+    uses: ./.github/workflows/x-keycloak-operator.yml
+    needs: [env, respin-number]
+    if: inputs.repository == 'keycloak-operator'
+    with:
+      gh-org: ${{ needs.env.outputs.gh-org }}
+      quay-org: ${{ needs.env.outputs.quay-org }}
+      docker-org: ${{ needs.env.outputs.docker-org }}
+      mvn-url: ${{ needs.env.outputs.mvn-releases-url }}
+      version: ${{ github.event.inputs.version }}
+      tag: ${{ github.event.inputs.version }}
+      respin: ${{ needs.respin-number.outputs.respin }}
+    secrets:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      MVN_USERNAME: ${{ secrets.MVN_USERNAME }}
+      MVN_TOKEN: ${{ secrets.MVN_TOKEN }}
+      QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
+      QUAY_TOKEN: ${{ secrets.QUAY_TOKEN }}
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
