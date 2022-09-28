@@ -124,4 +124,4 @@ jobs:
 
       - name: Show Container tags
         run: |
-          echo ${{ steps.meta.outputs.tags }} >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.meta.outputs.tags }}" >> $GITHUB_STEP_SUMMARY

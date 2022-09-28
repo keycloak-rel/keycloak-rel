@@ -67,7 +67,6 @@ jobs:
     uses: ./.github/workflows/x-keycloak-admin-console.yml
     with:
       gh-org: ${{ needs.env.outputs.gh-org }}
-      mvn-url: ${{ needs.env.outputs.mvn-releases-url }}
       version: ${{ github.event.inputs.version }}
       tag: ${{ github.event.inputs.version }}
     secrets:
