@@ -55,7 +55,6 @@ jobs:
     uses: ./.github/workflows/x-keycloak-admin-console.yml
     with:
       gh-org: ${{ needs.env.outputs.gh-org }}
-      mvn-url: ${{ needs.env.outputs.mvn-snapshots-url }}
       version: 999-SNAPSHOT
       tag: nightly
     secrets:
