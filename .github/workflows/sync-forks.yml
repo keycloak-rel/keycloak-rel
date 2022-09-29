@@ -22,6 +22,7 @@ jobs:
     name: Rebase from upstream
     runs-on: ubuntu-latest
     needs: [env]
+    if: needs.env.outputs.gh-org == 'keycloak-rel-testing'
 
     strategy:
       matrix:
@@ -41,7 +42,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
       with:
-        repository: '${{ inputs.gh-org }}/${{ matrix.repository }}'
+        repository: '${{ needs.env.outputs.gh-org }}/${{ matrix.repository }}'
         token: ${{ secrets.GH_TOKEN }}
         path: ${{ matrix.repository }}
         ref: 'main'
