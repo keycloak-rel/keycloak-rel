@@ -15,6 +15,9 @@ on:
       quay-org:
         description: "Quay Organization"
         value: ${{ jobs.env.outputs.quay-org }}
+      docker-org:
+        description: "Docker Organization"
+        value: ${{ jobs.env.outputs.docker-org }}
 
 defaults:
   run:
@@ -28,6 +31,7 @@ jobs:
       mvn-releases-url: ${{ steps.load-env.outputs.mvn-releases-url }}
       mvn-snapshots-url: ${{ steps.load-env.outputs.mvn-snapshots-url }}
       quay-org: ${{ steps.load-env.outputs.quay-org }}
+      docker-org: ${{ steps.load-env.outputs.docker-org }}
     steps:
       - uses: actions/checkout@v3
       - id: load-env
