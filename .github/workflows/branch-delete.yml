@@ -40,7 +40,7 @@ jobs:
           path: keycloak-rel
           ref: main
       - name: Push release branch
-        run: git push origin :${{ github.event.inputs.majorMinorVersion }}
+        run: git push origin :release/${{ github.event.inputs.majorMinorVersion }}
         working-directory: keycloak-rel
 
   delete-release-branches:
@@ -71,5 +71,5 @@ jobs:
           path: ${{ matrix.repository }}
 
       - name: Delete release branch
-        run: git push origin :${{ github.event.inputs.majorMinorVersion }}
+        run: git push origin :release/${{ github.event.inputs.majorMinorVersion }}
         working-directory: ${{ matrix.repository }}

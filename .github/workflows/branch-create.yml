@@ -36,7 +36,7 @@ jobs:
           path: keycloak-rel
           ref: main
       - name: Push release branch
-        run: git push origin main:${{ github.event.inputs.majorMinorVersion }}
+        run: git push origin main:release/${{ github.event.inputs.majorMinorVersion }}
         working-directory: keycloak-rel
 
   create-release-branches:
@@ -66,5 +66,5 @@ jobs:
         path: ${{ matrix.repository }}
 
     - name: Push release branch
-      run: git push origin main:${{ github.event.inputs.majorMinorVersion }}
+      run: git push origin main:release/${{ github.event.inputs.majorMinorVersion }}
       working-directory: ${{ matrix.repository }}
