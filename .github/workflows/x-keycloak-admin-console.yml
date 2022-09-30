@@ -37,12 +37,12 @@ jobs:
         if: inputs.gh-org == 'keycloak'
         run: |
           echo "MAVEN_ID=ossrh" >> $GITHUB_ENV
-          echo "MAVEN_OPTS=-Pnexus" >> $GITHUB_ENV
+          echo "MAVEN_OPTS=" >> $GITHUB_ENV
       - name: Maven Config for GitHub
         if: inputs.gh-org == 'keycloak-rel-testing'
         run: |
           echo "MAVEN_ID=github" >> $GITHUB_ENV
-          echo "MAVEN_OPTS=-DaltDeploymentRepository=github::default::https://maven.pkg.github.com/keycloak-rel-testing/maven" >> $GITHUB_ENV
+          echo "MAVEN_OPTS=-DskipNexus -DaltDeploymentRepository=github::default::https://maven.pkg.github.com/keycloak-rel-testing/maven" >> $GITHUB_ENV
 
       - name: Setup Java
         uses: actions/setup-java@v3.0.0
