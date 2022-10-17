@@ -15,9 +15,24 @@ on:
       quay-org:
         description: "Quay Organization"
         value: ${{ jobs.env.outputs.quay-org }}
+      operator-publish-repo-org:
+        description: "Target organization of fork for pushing necessary changes"
+        value: ${{ jobs.env.outputs.operator-publish-repo-org }}
+      operator-publish-author-name:
+        description: "Name of an author who creates PR for particular repositories"
+        value: ${{ jobs.env.outputs.operator-publish-author-name }}
+      operator-publish-author-email:
+        description: "Email of an author who creates PR for particular repositories"
+        value: ${{ jobs.env.outputs.operator-publish-author-email }}
       docker-org:
         description: "Docker Organization"
         value: ${{ jobs.env.outputs.docker-org }}
+      community-operators-repo:
+        description: "Community operators repository"
+        value: ${{ jobs.env.outputs.community-operators-repo }}
+      prod-operators-repo:
+        description: "Product operators repository"
+        value: ${{ jobs.env.outputs.prod-operators-repo }}
 
 defaults:
   run:
@@ -31,7 +46,12 @@ jobs:
       mvn-releases-url: ${{ env.mvn-releases-url }}
       mvn-snapshots-url: ${{ env.mvn-snapshots-url }}
       quay-org: ${{ env.quay-org }}
+      operator-publish-repo-org: ${{ env.operator-publish-repo-org }}
+      operator-publish-author-name: ${{ env.operator-publish-author-name }}
+      operator-publish-author-email: ${{ env.operator-publish-author-email }}
       docker-org: ${{ env.docker-org }}
+      community-operators-repo: ${{ env.community-operators-repo }}
+      prod-operators-repo: ${{ env.prod-operators-repo }}
     steps:
       - uses: actions/checkout@v3
       - id: load-env

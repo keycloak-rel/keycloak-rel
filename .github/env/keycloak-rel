@@ -5,3 +5,8 @@ mvn-snapshots-url=https://s01.oss.sonatype.org/content/repositories/snapshots/
 
 quay-org=keycloak
 docker-org=keycloak
+
+operator-publish-repo-org=keycloak-bot
+
+community-operators-repo=https://github.com/k8s-operatorhub/community-operators.git
+prod-operators-repo=https://github.com/redhat-openshift-ecosystem/community-operators-prod.git
