@@ -27,13 +27,13 @@ jobs:
   env:
     runs-on: ubuntu-latest
     outputs:
-      gh-org: ${{ steps.load-env.outputs.gh-org }}
-      mvn-releases-url: ${{ steps.load-env.outputs.mvn-releases-url }}
-      mvn-snapshots-url: ${{ steps.load-env.outputs.mvn-snapshots-url }}
-      quay-org: ${{ steps.load-env.outputs.quay-org }}
-      docker-org: ${{ steps.load-env.outputs.docker-org }}
+      gh-org: ${{ env.gh-org }}
+      mvn-releases-url: ${{ env.mvn-releases-url }}
+      mvn-snapshots-url: ${{ env.mvn-snapshots-url }}
+      quay-org: ${{ env.quay-org }}
+      docker-org: ${{ env.docker-org }}
     steps:
       - uses: actions/checkout@v3
       - id: load-env
         run: |
-          cat .github/env/${{ github.repository_owner }} | grep '=' | sed 's/=/::/g' | xargs -I {} echo "::set-output name={}"
+          cat .github/env/${{ github.repository_owner }} | sed -r '/^\s*$/d' >> $GITHUB_ENV
