@@ -165,7 +165,6 @@ jobs:
     name: Publish NPM packages
     needs: [env, keycloak, keycloak-documentation, keycloak-nodejs-admin, keycloak-admin-console]
     uses: ./.github/workflows/x-publish-npm.yml
-    if: needs.env.outputs.gh-org == 'keycloak'
     with:
       gh-org: ${{ needs.env.outputs.gh-org }}
       tag: ${{ github.event.inputs.version }}
