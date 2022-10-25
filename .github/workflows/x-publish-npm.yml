@@ -24,9 +24,36 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        repository:
-          - keycloak-nodejs-admin-client
+        include:
+          - repository: keycloak-nodejs-admin-client
+            asset: keycloak-nodejs-admin-client
+            path: package
+            extension: tgz
+
+          - repository: keycloak
+            asset: keycloak-oidc-js-adapter-${{ inputs.tag }}
+            path: keycloak-js-adapter-npm-dist-${{ inputs.tag }}
+            extension: zip
     steps:
+      - name: Download archive
+        run: gh release download ${{ inputs.tag }} --repo ${{ inputs.gh-org }}/${{ matrix.repository }} --pattern '${{ matrix.asset }}.${{ matrix.extension }}'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Extract ZIP
+        if: matrix.extension == 'zip'
+        run: unzip ${{ matrix.asset }}.zip
+
+      - name: Extract tarball
+        if: matrix.extension == 'tgz'
+        run: tar zxvf ${{ matrix.asset }}.tgz
+
+      - name: Move files into root
+        run: |
+          mv ${{ matrix.path }}/* .
+          rm -r ${{ matrix.path }}
+          rm ${{ matrix.asset }}.${{ matrix.extension }}
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
@@ -34,13 +61,8 @@ jobs:
           check-latest: true
           registry-url: https://registry.npmjs.org
 
-      - name: Download tarball
-        run: gh release download ${{ inputs.tag }} --repo ${{ inputs.gh-org }}/${{ matrix.repository }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-
       - name: Publish to NPM
-        run: npm publish ${{ matrix.repository }}.tgz
+        run: npm publish --ignore-scripts ${{ inputs.gh-org != 'keycloak' && ' --dry-run' }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -48,6 +70,8 @@ jobs:
     name: Show NPM packages
     runs-on: ubuntu-latest
     needs: [publish-npm]
+    if: inputs.gh-org == 'keycloak'
     steps:
       - run: |
           echo "https://www.npmjs.com/package/@keycloak/keycloak-admin-client/v/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
+          echo "https://www.npmjs.com/package/keycloak-js/v/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
