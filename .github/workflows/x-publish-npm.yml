@@ -30,6 +30,11 @@ jobs:
             path: package
             extension: tgz
 
+          - repository: keycloak-nodejs-connect
+            asset: keycloak-nodejs-connect
+            path: package
+            extension: tgz
+
           - repository: keycloak
             asset: keycloak-oidc-js-adapter-${{ inputs.tag }}
             path: keycloak-js-adapter-npm-dist-${{ inputs.tag }}

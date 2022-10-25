@@ -35,6 +35,7 @@ jobs:
           - keycloak-admin-ui
           - keycloak-documentation
           - keycloak-nodejs-admin-client
+          - keycloak-nodejs-connect
           - keycloak-quickstarts
 
     steps:
