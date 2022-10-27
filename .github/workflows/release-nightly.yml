@@ -61,7 +61,7 @@ jobs:
 
   keycloak-admin-console:
     name: Keycloak Admin Console
-    needs: [env, create-tags]
+    needs: [env, create-tags, keycloak-nodejs-admin]
     uses: ./.github/workflows/x-keycloak-admin-console.yml
     with:
       gh-org: ${{ needs.env.outputs.gh-org }}
