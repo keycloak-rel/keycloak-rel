@@ -67,7 +67,7 @@ jobs:
           registry-url: https://registry.npmjs.org
 
       - name: Publish to NPM
-        run: npm publish --ignore-scripts ${{ inputs.gh-org != 'keycloak' && ' --dry-run' }}
+        run: npm publish --ignore-scripts ${{ inputs.gh-org != 'keycloak' && ' --dry-run' || '' }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
