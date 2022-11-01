@@ -1,4 +1,4 @@
-name: Reusable workflow
+name: X Environment setup
 
 on:
   workflow_call:
