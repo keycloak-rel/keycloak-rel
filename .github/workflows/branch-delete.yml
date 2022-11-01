@@ -39,6 +39,7 @@ jobs:
         with:
           path: keycloak-rel
           ref: main
+          token: ${{ secrets.GH_TOKEN }}
       - name: Push release branch
         run: git push origin :release/${{ github.event.inputs.majorMinorVersion }}
         working-directory: keycloak-rel
