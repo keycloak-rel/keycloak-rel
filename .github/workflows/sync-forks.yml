@@ -29,11 +29,9 @@ jobs:
         repository:
           - keycloak
           - keycloak-admin-ui
-          - keycloak-containers
           - keycloak-documentation
           - keycloak-nodejs-admin-client
           - keycloak-nodejs-connect
-          - keycloak-operator
           - keycloak-quickstarts
           - keycloak-web
           - keycloak.github.io
