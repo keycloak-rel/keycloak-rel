@@ -32,6 +32,7 @@ jobs:
           - keycloak
           - keycloak-documentation
           - keycloak-nodejs-admin-client
+          - keycloak-nodejs-connect
     steps:
       - name: Check if release exists
         id: release-exists

@@ -26,6 +26,7 @@ jobs:
           - keycloak
           - keycloak-documentation
           - keycloak-nodejs-admin-client
+          - keycloak-nodejs-connect
     steps:
       - name: Publish release
         run: gh release edit ${{ inputs.tag }} --repo ${{ inputs.gh-org }}/${{ matrix.repository }} --draft=false
@@ -41,3 +42,4 @@ jobs:
           echo "https://github.com/${{ inputs.gh-org }}/keycloak/releases/tag/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
           echo "https://github.com/${{ inputs.gh-org }}/keycloak-documentation/releases/tag/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
           echo "https://github.com/${{ inputs.gh-org }}/keycloak-nodejs-admin-client/releases/tag/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
+          echo "https://github.com/${{ inputs.gh-org }}/keycloak-nodejs-connect/releases/tag/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY

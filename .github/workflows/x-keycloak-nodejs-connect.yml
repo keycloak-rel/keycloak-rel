@@ -1,4 +1,4 @@
-name: X Keycloak Node.js Admin Client
+name: X Keycloak Node.js Connect
 
 on:
   workflow_call:
@@ -24,7 +24,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          repository: ${{ inputs.gh-org }}/keycloak-nodejs-admin-client
+          repository: ${{ inputs.gh-org }}/keycloak-nodejs-connect
           token: ${{ secrets.GH_TOKEN }}
           ref: ${{ inputs.tag }}
 
@@ -35,20 +35,16 @@ jobs:
           check-latest: true
           cache: npm
 
-      - name: Install dependencies
-        run: npm ci
-
       - name: Create package tarball
         run: |
-          npm run prepublishOnly
           npm pack
-          mv -T *.tgz keycloak-nodejs-admin-client.tgz
+          mv -T *.tgz keycloak-nodejs-connect.tgz
 
       - name: Upload to GitHub Releases
         run: |
           for i in `gh release view ${{ inputs.tag }} --json assets --jq '.assets[].name'`; do 
             test -f $i || gh release delete-asset ${{ inputs.tag }} $i -y
           done
-          gh release upload ${{ inputs.tag }} keycloak-nodejs-admin-client.tgz --clobber
+          gh release upload ${{ inputs.tag }} keycloak-nodejs-connect.tgz --clobber
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
