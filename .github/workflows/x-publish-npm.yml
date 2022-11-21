@@ -71,6 +71,13 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      # TODO: Remove this once we stop supporting the Node.js Connect package.
+      - name: Deprecate package
+        if: inputs.gh-org == 'keycloak' && matrix.asset == 'keycloak-nodejs-connect'
+        run: npm deprecate keycloak-connect "This package is deprecated and will be removed in the future. We will shortly provide more details on removal date, and recommended alternatives."
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
   list-npm:
     name: Show NPM packages
     runs-on: ubuntu-latest
