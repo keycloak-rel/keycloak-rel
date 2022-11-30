@@ -93,7 +93,7 @@ Tag name is {version} (for example `19.0.0`), or `nightly` for nightly releases.
 |Repo|Main|Test|
 |----|----|----|
 |keycloak|https://github.com/keycloak/keycloak|https://github.com/keycloak-rel-testing/keycloak|
-|keycloak-admin-ui|https://github.com/keycloak/keycloak-admin-ui|https://github.com/keycloak-rel-testing/keycloak-admin-ui|
+|keycloak-ui|https://github.com/keycloak/keycloak-ui|https://github.com/keycloak-rel-testing/keycloak-ui|
 |keycloak|https://github.com/keycloak/keycloak-documentation|https://github.com/keycloak-rel-testing/keycloak-documentation|
 |keycloak-nodejs-admin-client|https://github.com/keycloak/keycloak-nodejs-admin-client|https://github.com/keycloak-rel-testing/keycloak-nodejs-admin-client|
 |keycloak-quickstarts|https://github.com/keycloak/keycloak-quickstarts|https://github.com/keycloak-rel-testing/keycloak-quickstarts|

@@ -58,7 +58,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3.0.0
         with:
-          repository: '${{ inputs.gh-org }}/keycloak-admin-ui'
+          repository: '${{ inputs.gh-org }}/keycloak-ui'
           token: ${{ secrets.GH_TOKEN }}
           ref: ${{ inputs.tag }}
 

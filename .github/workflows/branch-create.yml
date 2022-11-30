@@ -49,7 +49,7 @@ jobs:
       matrix:
         repository:
           - keycloak
-          - keycloak-admin-ui
+          - keycloak-ui
           - keycloak-documentation
           - keycloak-nodejs-admin-client
           - keycloak-nodejs-connect
