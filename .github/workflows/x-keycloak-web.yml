@@ -73,6 +73,11 @@ jobs:
         with:
           repository: '${{ inputs.gh-org }}/keycloak-web'
           token: ${{ secrets.GH_TOKEN }}
+          
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
 
       - name: Add version
         run: ./add-version.sh ${{ inputs.version }}
