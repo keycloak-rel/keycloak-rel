@@ -24,7 +24,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          repository: ${{ inputs.gh-org }}/keycloak-nodejs-admin-client
+          repository: ${{ inputs.gh-org }}/keycloak
           token: ${{ secrets.GH_TOKEN }}
           ref: ${{ inputs.tag }}
 
@@ -34,17 +34,21 @@ jobs:
           node-version: 16
           check-latest: true
           cache: npm
+          cache-dependency-path: js/package-lock.json
 
       - name: Install dependencies
+        working-directory: js
         run: npm ci
 
       - name: Create package tarball
+        working-directory: js/libs/keycloak-admin-client
         run: |
           npm run prepublishOnly
           npm pack
           mv -T *.tgz keycloak-nodejs-admin-client.tgz
 
       - name: Upload to GitHub Releases
+        working-directory: js/libs/keycloak-admin-client
         run: |
           for i in `gh release view ${{ inputs.tag }} --json assets --jq '.assets[].name'`; do 
             test -f $i || gh release delete-asset ${{ inputs.tag }} $i -y
