@@ -110,7 +110,7 @@ Release name is {version} (for example `19.0.0`), or `nightly` for nightly relea
 
 ## Maven
 
-Nightly releases uses `999-SNAPSHOT` version. Maven artifacts are currently published to GitHub Packages for test releases, but plan is to stop doing this and only upload to GitHub releases.
+Nightly releases uses `999.0.0-SNAPSHOT` version. Maven artifacts are currently published to GitHub Packages for test releases, but plan is to stop doing this and only upload to GitHub releases.
 
 |Main - Release|Main - Nightly|Test|
 |--------------|--------------|----|
