@@ -50,16 +50,6 @@ jobs:
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-  keycloak-nodejs-admin:
-    name: Keycloak Node.js Admin Client
-    needs: [env, create-tags, create-gh-releases]
-    uses: ./.github/workflows/x-keycloak-nodejs-admin.yml
-    with:
-      gh-org: ${{ needs.env.outputs.gh-org }}
-      tag: ${{ github.event.inputs.version }}
-    secrets:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
-
   keycloak-nodejs-connect:
     name: Keycloak Node.js Connect
     needs: [env, create-tags, create-gh-releases]
@@ -72,7 +62,7 @@ jobs:
 
   keycloak-admin-console:
     name: Keycloak Admin Console
-    needs: [env, create-tags, keycloak-nodejs-admin]
+    needs: [env, create-tags]
     uses: ./.github/workflows/x-keycloak-admin-console.yml
     with:
       gh-org: ${{ needs.env.outputs.gh-org }}
@@ -162,7 +152,7 @@ jobs:
 
   publish-gh-releases:
     name: Publish releases
-    needs: [env, keycloak, keycloak-documentation, keycloak-nodejs-admin, keycloak-nodejs-connect, keycloak-admin-console]
+    needs: [env, keycloak, keycloak-documentation, keycloak-nodejs-connect, keycloak-admin-console]
     uses: ./.github/workflows/x-publish-gh-releases.yml
     with:
       gh-org: ${{ needs.env.outputs.gh-org }}
@@ -172,7 +162,7 @@ jobs:
 
   publish-npm:
     name: Publish NPM packages
-    needs: [env, keycloak, keycloak-documentation, keycloak-nodejs-admin, keycloak-nodejs-connect, keycloak-admin-console]
+    needs: [env, keycloak, keycloak-documentation, keycloak-nodejs-connect, keycloak-admin-console]
     uses: ./.github/workflows/x-publish-npm.yml
     with:
       gh-org: ${{ needs.env.outputs.gh-org }}

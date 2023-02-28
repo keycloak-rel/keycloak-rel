@@ -30,7 +30,6 @@ jobs:
           - keycloak
           - keycloak-ui
           - keycloak-documentation
-          - keycloak-nodejs-admin-client
           - keycloak-nodejs-connect
           - keycloak-quickstarts
           - keycloak-web
