@@ -34,7 +34,6 @@ jobs:
           - keycloak
           - keycloak-ui
           - keycloak-documentation
-          - keycloak-nodejs-admin-client
           - keycloak-nodejs-connect
           - keycloak-quickstarts
 
@@ -73,5 +72,4 @@ jobs:
           echo "https://github.com/${{ inputs.gh-org }}/keycloak/tree/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
           echo "https://github.com/${{ inputs.gh-org }}/keycloak-ui/tree/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
           echo "https://github.com/${{ inputs.gh-org }}/keycloak-documentation/tree/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
-          echo "https://github.com/${{ inputs.gh-org }}/keycloak-nodejs-admin-client/tree/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
           echo "https://github.com/${{ inputs.gh-org }}/keycloak-quickstarts/tree/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY

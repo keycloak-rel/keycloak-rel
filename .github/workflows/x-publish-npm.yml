@@ -25,8 +25,8 @@ jobs:
     strategy:
       matrix:
         include:
-          - repository: keycloak-nodejs-admin-client
-            asset: keycloak-nodejs-admin-client
+          - repository: keycloak
+            asset: keycloak-admin-client-${{ inputs.tag }}
             path: package
             extension: tgz
 

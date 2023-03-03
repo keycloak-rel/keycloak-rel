@@ -95,7 +95,6 @@ Tag name is {version} (for example `19.0.0`), or `nightly` for nightly releases.
 |keycloak|https://github.com/keycloak/keycloak|https://github.com/keycloak-rel-testing/keycloak|
 |keycloak-ui|https://github.com/keycloak/keycloak-ui|https://github.com/keycloak-rel-testing/keycloak-ui|
 |keycloak|https://github.com/keycloak/keycloak-documentation|https://github.com/keycloak-rel-testing/keycloak-documentation|
-|keycloak-nodejs-admin-client|https://github.com/keycloak/keycloak-nodejs-admin-client|https://github.com/keycloak-rel-testing/keycloak-nodejs-admin-client|
 |keycloak-quickstarts|https://github.com/keycloak/keycloak-quickstarts|https://github.com/keycloak-rel-testing/keycloak-quickstarts|
 
 ## GitHub releases
@@ -106,7 +105,6 @@ Release name is {version} (for example `19.0.0`), or `nightly` for nightly relea
 |----|----|----|
 |keycloak|https://github.com/keycloak/keycloak/releases|https://github.com/keycloak-rel-testing/keycloak/releases|
 |keycloak-documentation|https://github.com/keycloak/keycloak-documentation/releases|https://github.com/keycloak-rel-testing/keycloak-documentation/releases|
-|keycloak-nodejs-admin-client|https://github.com/keycloak/keycloak-nodejs-admin-client/releases|https://github.com/keycloak-rel-testing/keycloak-nodejs-admin-client/releases|
 
 ## Maven
 
