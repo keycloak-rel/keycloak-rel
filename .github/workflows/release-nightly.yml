@@ -49,24 +49,9 @@ jobs:
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-  keycloak-admin-console:
-    name: Keycloak Admin Console
-    needs: [env, create-tags]
-    uses: ./.github/workflows/x-keycloak-admin-console.yml
-    with:
-      gh-org: ${{ needs.env.outputs.gh-org }}
-      version: 999.0.0-SNAPSHOT
-      tag: nightly
-    secrets:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      MVN_USERNAME: ${{ secrets.MVN_USERNAME }}
-      MVN_TOKEN: ${{ secrets.MVN_TOKEN }}
-      GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-      GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-
   keycloak:
     name: Keycloak
-    needs: [env, create-tags, create-gh-releases, keycloak-admin-console]
+    needs: [env, create-tags, create-gh-releases]
     uses: ./.github/workflows/x-keycloak.yml
     with:
       gh-org: ${{ needs.env.outputs.gh-org }}
@@ -141,7 +126,7 @@ jobs:
 
   publish-gh-releases:
     name: Publish releases
-    needs: [env, keycloak, keycloak-documentation, keycloak-nodejs-connect, keycloak-admin-console]
+    needs: [env, keycloak, keycloak-documentation, keycloak-nodejs-connect]
     uses: ./.github/workflows/x-publish-gh-releases.yml
     with:
       gh-org: ${{ needs.env.outputs.gh-org }}
