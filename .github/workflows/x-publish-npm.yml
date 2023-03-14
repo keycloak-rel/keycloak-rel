@@ -24,40 +24,15 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        include:
-          - repository: keycloak
-            asset: keycloak-admin-client-${{ inputs.tag }}
-            path: package
-            extension: tgz
-
-          - repository: keycloak-nodejs-connect
-            asset: keycloak-nodejs-connect
-            path: package
-            extension: tgz
-
-          - repository: keycloak
-            asset: keycloak-oidc-js-adapter-${{ inputs.tag }}
-            path: keycloak-js-adapter-npm-dist-${{ inputs.tag }}
-            extension: zip
+        tarball:
+          - keycloak-admin-client-${{ inputs.tag }}.tgz
+          - keycloak-nodejs-connect.tgz
+          - keycloak-js-${{ inputs.tag }}.tgz
     steps:
       - name: Download archive
-        run: gh release download ${{ inputs.tag }} --repo ${{ inputs.gh-org }}/${{ matrix.repository }} --pattern '${{ matrix.asset }}.${{ matrix.extension }}'
+        run: gh release download ${{ inputs.tag }} --repo ${{ inputs.gh-org }}/keycloak --pattern '${{ matrix.tarball }}'
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-
-      - name: Extract ZIP
-        if: matrix.extension == 'zip'
-        run: unzip ${{ matrix.asset }}.zip
-
-      - name: Extract tarball
-        if: matrix.extension == 'tgz'
-        run: tar zxvf ${{ matrix.asset }}.tgz
-
-      - name: Move files into root
-        run: |
-          mv ${{ matrix.path }}/* .
-          rm -r ${{ matrix.path }}
-          rm ${{ matrix.asset }}.${{ matrix.extension }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -67,13 +42,13 @@ jobs:
           registry-url: https://registry.npmjs.org
 
       - name: Publish to NPM
-        run: npm publish --ignore-scripts ${{ inputs.gh-org != 'keycloak' && ' --dry-run' || '' }}
+        run: npm publish ${{ matrix.tarball }} --ignore-scripts ${{ inputs.gh-org != 'keycloak' && ' --dry-run' || '' }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       # TODO: Remove this once we stop supporting the Node.js Connect package.
       - name: Deprecate package
-        if: inputs.gh-org == 'keycloak' && matrix.asset == 'keycloak-nodejs-connect'
+        if: inputs.gh-org == 'keycloak' && matrix.tarball == 'keycloak-nodejs-connect.tgz'
         run: npm deprecate keycloak-connect "This package is deprecated and will be removed in the future. We will shortly provide more details on removal date, and recommended alternatives."
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
