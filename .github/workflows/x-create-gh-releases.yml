@@ -30,7 +30,6 @@ jobs:
       matrix:
         repository:
           - keycloak
-          - keycloak-ui
           - keycloak-documentation
           - keycloak-nodejs-connect
     steps:

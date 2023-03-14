@@ -24,7 +24,6 @@ jobs:
       matrix:
         repository:
           - keycloak
-          - keycloak-ui
           - keycloak-documentation
           - keycloak-nodejs-connect
     steps:
@@ -40,6 +39,5 @@ jobs:
     steps:
       - run: |
           echo "https://github.com/${{ inputs.gh-org }}/keycloak/releases/tag/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
-          echo "https://github.com/${{ inputs.gh-org }}/keycloak-ui/releases/tag/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
           echo "https://github.com/${{ inputs.gh-org }}/keycloak-documentation/releases/tag/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
           echo "https://github.com/${{ inputs.gh-org }}/keycloak-nodejs-connect/releases/tag/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
