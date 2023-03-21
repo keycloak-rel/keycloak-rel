@@ -113,17 +113,6 @@ jobs:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
 
-  keycloak-documentation:
-    name: Keycloak Documentation
-    needs: [env, create-tags, create-gh-releases]
-    uses: ./.github/workflows/x-keycloak-documentation.yml
-    with:
-      gh-org: ${{ needs.env.outputs.gh-org }}
-      version: ${{ github.event.inputs.version }}
-      tag: ${{ github.event.inputs.version }}
-    secrets:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
-
   keycloak-quickstarts:
     name: Keycloak QuickStarts
     needs: [env, create-tags, keycloak]
@@ -137,7 +126,7 @@ jobs:
 
   publish-gh-releases:
     name: Publish releases
-    needs: [env, keycloak, keycloak-documentation, keycloak-nodejs-connect]
+    needs: [env, keycloak, keycloak-nodejs-connect]
     uses: ./.github/workflows/x-publish-gh-releases.yml
     with:
       gh-org: ${{ needs.env.outputs.gh-org }}
@@ -147,7 +136,7 @@ jobs:
 
   publish-npm:
     name: Publish NPM packages
-    needs: [env, keycloak, keycloak-documentation, keycloak-nodejs-connect]
+    needs: [env, keycloak, keycloak-nodejs-connect]
     uses: ./.github/workflows/x-publish-npm.yml
     with:
       gh-org: ${{ needs.env.outputs.gh-org }}

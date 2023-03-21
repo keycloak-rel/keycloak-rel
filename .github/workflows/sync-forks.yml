@@ -28,7 +28,6 @@ jobs:
       matrix:
         repository:
           - keycloak
-          - keycloak-documentation
           - keycloak-nodejs-connect
           - keycloak-quickstarts
           - keycloak-web

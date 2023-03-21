@@ -30,7 +30,6 @@ jobs:
       matrix:
         repository:
           - keycloak
-          - keycloak-documentation
           - keycloak-nodejs-connect
     steps:
       - name: Check if release exists

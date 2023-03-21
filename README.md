@@ -93,7 +93,6 @@ Tag name is {version} (for example `19.0.0`), or `nightly` for nightly releases.
 |Repo|Main|Test|
 |----|----|----|
 |keycloak|https://github.com/keycloak/keycloak|https://github.com/keycloak-rel-testing/keycloak|
-|keycloak|https://github.com/keycloak/keycloak-documentation|https://github.com/keycloak-rel-testing/keycloak-documentation|
 |keycloak-quickstarts|https://github.com/keycloak/keycloak-quickstarts|https://github.com/keycloak-rel-testing/keycloak-quickstarts|
 
 ## GitHub releases
@@ -103,7 +102,6 @@ Release name is {version} (for example `19.0.0`), or `nightly` for nightly relea
 |Repo|Main|Test|
 |----|----|----|
 |keycloak|https://github.com/keycloak/keycloak/releases|https://github.com/keycloak-rel-testing/keycloak/releases|
-|keycloak-documentation|https://github.com/keycloak/keycloak-documentation/releases|https://github.com/keycloak-rel-testing/keycloak-documentation/releases|
 
 ## Maven
 

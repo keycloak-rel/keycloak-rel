@@ -41,7 +41,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          gh release -R ${{ inputs.gh-org }}/keycloak-documentation download ${{ inputs.version }} -p keycloak-documentation-${{ inputs.version }}.zip
+          gh release -R ${{ inputs.gh-org }}/keycloak download ${{ inputs.version }} -p keycloak-documentation-${{ inputs.version }}.zip
           unzip keycloak-documentation-${{ inputs.version }}.zip
           rm keycloak-documentation-${{ inputs.version }}.zip
           mv keycloak-documentation-${{ inputs.version }} docs/${{ inputs.version }}
