@@ -45,6 +45,6 @@ jobs:
           for i in `gh release view ${{ inputs.tag }} --json assets --jq '.assets[].name'`; do 
             test -f $i || gh release delete-asset ${{ inputs.tag }} $i -y
           done
-          gh release upload ${{ inputs.tag }} keycloak-nodejs-connect.tgz --clobber
+          gh release upload ${{ inputs.tag }} --repo ${{ inputs.gh-org }}/keycloak keycloak-nodejs-connect.tgz --clobber
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
