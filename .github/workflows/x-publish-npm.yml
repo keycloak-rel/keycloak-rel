@@ -24,13 +24,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        tarball:
-          - keycloak-admin-client-${{ inputs.tag }}.tgz
-          - keycloak-nodejs-connect.tgz
-          - keycloak-js-${{ inputs.tag }}.tgz
+        include:
+          - tarball: keycloak-admin-client-${{ inputs.tag }}.tgz
+          - tarball: keycloak-js-${{ inputs.tag }}.tgz
+          - tarball: keycloak-nodejs-connect.tgz
+            repo: keycloak-nodejs-connect
     steps:
       - name: Download archive
-        run: gh release download ${{ inputs.tag }} --repo ${{ inputs.gh-org }}/keycloak --pattern '${{ matrix.tarball }}'
+        run: gh release download ${{ inputs.tag }} --repo ${{ inputs.gh-org }}/${{ matrix.repo || 'keycloak' }} --pattern '${{ matrix.tarball }}'
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
