@@ -112,14 +112,13 @@ jobs:
               -DskipTests \
               -Dquarkus.container-image.image=quay.io/${{ inputs.quay-org }}/keycloak-operator:${{ inputs.tag }} \
               -Dquarkus.container-image.build=true \
-              -Dquarkus.jib.image-id-file=image-id.txt \
               -Doperator.keycloak.image=quay.io/${{ inputs.quay-org }}/keycloak:${{ inputs.tag }}
 
       - name: Tag and push the operator images
         working-directory: keycloak
         run: |
           echo "${{ steps.meta.outputs.tags }}" | xargs -I {} \
-            sh -c "docker tag $(cat operator/target/image-id.txt) {} && docker push {}"
+            sh -c "docker tag quay.io/${{ inputs.quay-org }}/keycloak-operator:${{ inputs.tag }} {} && docker push {}"
 
       - name: Clone k8s resources repository
         uses: actions/checkout@v3.0.0
