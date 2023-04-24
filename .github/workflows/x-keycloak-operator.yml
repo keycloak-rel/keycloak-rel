@@ -106,7 +106,7 @@ jobs:
         working-directory: keycloak
         # hardcoded Quay.io image coordinates here are used only for building the K8s YAML resources (where we use Quay and not Docker Hub)
         run: |
-          ./mvnw clean package \
+          ./mvnw -B clean package \
               -s ./.github/mvn-rel-settings.xml \
               -f operator/pom.xml \
               -DskipTests \
