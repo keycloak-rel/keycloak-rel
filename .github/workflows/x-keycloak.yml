@@ -63,7 +63,7 @@ jobs:
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
           MVN_HTTP_CONFIG="-Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.http.retryHandler.class=standard -Dmaven.wagon.http.retryHandler.count=3 -Dmaven.wagon.httpconnectionManager.ttlSeconds=120"
-          ./mvnw -s ./.github/mvn-rel-settings.xml -nsu -B -Pgpg,jboss-release,distribution-downloads,all -Djboss.releases.repo.id=$MAVEN_ID -Djboss.releases.repo.url=${{ inputs.mvn-url }} -Djboss.snapshots.repo.id=$MAVEN_ID -Djboss.snapshots.repo.url=${{ inputs.mvn-url }} -DskipTests -DskipTestsuite -DretryFailedDeploymentCount=10 -DautoReleaseAfterClose=true $MVN_HTTP_CONFIG clean deploy | tee deploy.log
+          ./mvnw -s ./.github/mvn-rel-settings.xml -nsu -B -Pgpg,jboss-release,distribution-downloads,all,latest -Djboss.releases.repo.id=$MAVEN_ID -Djboss.releases.repo.url=${{ inputs.mvn-url }} -Djboss.snapshots.repo.id=$MAVEN_ID -Djboss.snapshots.repo.url=${{ inputs.mvn-url }} -DskipTests -DskipTestsuite -DretryFailedDeploymentCount=10 -DautoReleaseAfterClose=true $MVN_HTTP_CONFIG clean deploy | tee deploy.log
 
       - name: Show Maven artifacts
         run: |
