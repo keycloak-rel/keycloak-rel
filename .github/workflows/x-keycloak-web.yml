@@ -83,6 +83,9 @@ jobs:
       - name: Add version
         run: ./add-version.sh ${{ inputs.version }}
 
+      - name: Build version
+        run: mvn -s mvn-rel-settings.xml package -Dpublish
+
       - name: Commit to repository
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com
