@@ -94,3 +94,8 @@ jobs:
           git add --all
           git commit -m "Keycloak ${{ inputs.version }} release"
           git push origin main:main
+
+      - name: Attach release notes to GH release
+        run: gh release edit --repo keycloak/keycloak --notes-file cache/releases/${{ inputs.version }}/gh-release-notes.html ${{ inputs.version }}
+        with:
+          token: ${{ secrets.GH_TOKEN }}
