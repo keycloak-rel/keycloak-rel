@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       majorMinorVersion:
-        description: Major.minor version (for example 18.0)
+        description: 'Major.minor version (for example 18.0)'
         required: true
 
 concurrency: rel-branches
@@ -14,11 +14,12 @@ defaults:
     shell: bash
 
 jobs:
+
   show-inputs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          echo "Major.minor version: ${{ inputs.majorMinorVersion }}" >> $GITHUB_STEP_SUMMARY
+          echo "Major.minor version: ${{ inputs.majorMinorVersion }}  " >> $GITHUB_STEP_SUMMARY
 
   env:
     uses: ./.github/workflows/x-env.yml
@@ -52,22 +53,14 @@ jobs:
           - keycloak-quickstarts
 
     steps:
-      - name: Check out '${{ needs.env.outputs.gh-org }}/${{ matrix.repository }}'
-        uses: actions/checkout@v3
-        with:
-          repository: ${{ needs.env.outputs.gh-org }}/${{ matrix.repository }}
-          ref: main
-          token: ${{ secrets.GH_TOKEN }}
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        repository: '${{ needs.env.outputs.gh-org }}/${{ matrix.repository }}'
+        ref: 'main'
+        token: ${{ secrets.GH_TOKEN }}
+        path: ${{ matrix.repository }}
 
-      - name: Set version to '${{ github.event.inputs.majorMinorVersion }}-SNAPSHOT'
-        run: ./set-version.sh ${{ github.event.inputs.majorMinorVersion }}-SNAPSHOT
-
-      - name: Create version commit
-        run: |
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]"
-          git add .
-          git commit -m "Set version to ${{ github.event.inputs.majorMinorVersion }}-SNAPSHOT"
-
-      - name: Push release branch
-        run: git push origin main:release/${{ github.event.inputs.majorMinorVersion }}
+    - name: Push release branch
+      run: git push origin main:release/${{ github.event.inputs.majorMinorVersion }}
+      working-directory: ${{ matrix.repository }}
