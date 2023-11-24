@@ -85,6 +85,8 @@ jobs:
 
       - name: Build version
         run: mvn -s mvn-rel-settings.xml package -Dpublish
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Commit to repository
         run: |
@@ -97,3 +99,5 @@ jobs:
 
       - name: Attach release notes to GH release
         run: gh release edit --repo keycloak/keycloak --notes-file cache/releases/${{ inputs.version }}/gh-release-notes.html ${{ inputs.version }}
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
