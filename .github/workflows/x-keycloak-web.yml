@@ -82,9 +82,6 @@ jobs:
 
       - name: Add version
         run: ./add-version.sh ${{ inputs.version }}
-
-      - name: Build version
-        run: mvn -s mvn-rel-settings.xml package -Dpublish
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
