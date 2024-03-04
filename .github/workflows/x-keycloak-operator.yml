@@ -112,7 +112,7 @@ jobs:
               -DskipTests \
               -Dquarkus.container-image.image=quay.io/${{ inputs.quay-org }}/keycloak-operator:${{ inputs.tag }} \
               -Dquarkus.container-image.build=true \
-              -Doperator.keycloak.image=quay.io/${{ inputs.quay-org }}/keycloak:${{ inputs.tag }}
+              -Dkc.operator.keycloak.image=quay.io/${{ inputs.quay-org }}/keycloak:${{ inputs.tag }}
 
       - name: Tag and push the operator images
         working-directory: keycloak
