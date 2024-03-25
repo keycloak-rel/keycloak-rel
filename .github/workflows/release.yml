@@ -60,6 +60,11 @@ jobs:
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
+  keycloak-account-ui:
+    name: Keycloak account ui library
+    needs: [env, create-tags, create-gh-releases]
+    uses: ./.github/workflows/x-keycloak-account-ui.yml
+
   keycloak:
     name: Keycloak
     needs: [env, create-tags, create-gh-releases]
