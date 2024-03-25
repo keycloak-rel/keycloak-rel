@@ -1,0 +1,33 @@
+name: X Keycloak account ui build
+
+on:
+  workflow_call:
+    inputs:
+      gh-org:
+        required: true
+        type: string
+      tag:
+        required: true
+        type: string
+    secrets:
+      GH_TOKEN:
+        required: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          check-latest: true
+          cache: npm
+      - name: Build
+        run: |
+          LIB=true pnpm --workspace keycloak-account-ui run build
+
