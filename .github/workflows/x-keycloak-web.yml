@@ -37,6 +37,9 @@ jobs:
           rm keycloak-api-docs-${{ inputs.version }}.zip
           mv keycloak-api-docs-${{ inputs.version }} docs-api/${{ inputs.version }}
 
+          cd docs-api
+          rm -rf latest
+          ln -s ${{ inputs.version }} latest
       - name: Download documentation
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
