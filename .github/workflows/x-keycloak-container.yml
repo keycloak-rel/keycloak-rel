@@ -97,7 +97,9 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          build-args: KEYCLOAK_DIST=keycloak-${{ inputs.version }}.tar.gz
+          build-args: |
+            KEYCLOAK_DIST=keycloak-${{ inputs.version }}.tar.gz
+            KEYCLOAK_VERSION=${{ inputs.version }}
 
       - name: Show Container Tags
         run: |
