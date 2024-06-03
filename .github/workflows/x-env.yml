@@ -33,7 +33,7 @@ jobs:
       quay-org: ${{ env.quay-org }}
       docker-org: ${{ env.docker-org }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - id: load-env
         run: |
           cat .github/env/${{ github.repository_owner }} | sed -r '/^\s*$/d' >> $GITHUB_ENV
