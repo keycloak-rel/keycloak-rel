@@ -25,6 +25,7 @@ jobs:
     strategy:
       matrix:
         include:
+          - tarball: keycloak-admin-ui-${{ inputs.tag }}.tgz
           - tarball: keycloak-account-ui-${{ inputs.tag }}.tgz
           - tarball: keycloak-ui-shared-${{ inputs.tag }}.tgz
           - tarball: keycloak-admin-client-${{ inputs.tag }}.tgz
@@ -57,6 +58,7 @@ jobs:
     steps:
       - run: |
           echo "https://www.npmjs.com/package/@keycloak/keycloak-admin-client/v/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
+          echo "https://www.npmjs.com/package/@keycloak/keycloak-admin-ui/v/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
           echo "https://www.npmjs.com/package/@keycloak/keycloak-account-ui/v/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
           echo "https://www.npmjs.com/package/@keycloak/keycloak-ui-shared/v/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
           echo "https://www.npmjs.com/package/keycloak-js/v/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
