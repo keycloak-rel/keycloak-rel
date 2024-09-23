@@ -38,7 +38,7 @@ jobs:
           mv keycloak-api-docs-${{ inputs.version }} docs-api/${{ inputs.version }}
 
           cd docs-api
-          rm -rf latest
+          rm latest
           ln -s ${{ inputs.version }} latest
       - name: Download documentation
         env:
@@ -50,7 +50,7 @@ jobs:
           mv keycloak-documentation-${{ inputs.version }} docs/${{ inputs.version }}
 
           cd docs
-          rm -rf latest
+          rm latest
           ln -s ${{ inputs.version }} latest
       - name: Commit to repository
         env:
@@ -62,6 +62,7 @@ jobs:
           git add docs/${{ inputs.version }}
           git add docs/latest
           git add docs-api/${{ inputs.version }}
+          git add docs-api/latest
 
           git commit -m "Documentation for ${{ inputs.version }}"
           git push origin main:main
