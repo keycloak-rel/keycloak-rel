@@ -1,0 +1,180 @@
+name: X Keycloak Operator Hub publish
+
+on:
+  workflow_call:
+    inputs:
+      gh-org:
+        required: true
+        type: string
+      quay-org:
+        required: true
+        type: string
+      operator-publish-repo-org:
+        required: true
+        type: string
+      community-operators-repo:
+        required: true
+        type: string
+      prod-operators-repo:
+        required: true
+        type: string
+      mvn-url:
+        required: true
+        type: string
+      version:
+        required: true
+        type: string
+      previous-version:
+        required: true
+        type: string
+    secrets:
+      GH_TOKEN:
+        required: true
+      MVN_USERNAME:
+        required: true
+      MVN_TOKEN:
+        required: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          repository: keycloak/keycloak
+          ref: ${{ inputs.version }}
+          path: keycloak
+
+      - name: Build
+        env:
+          MAVEN_ID: kc-rel-repository
+          MAVEN_URL: ${{ inputs.mvn-url }}
+          MAVEN_USERNAME: ${{ secrets.MVN_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.MVN_TOKEN }}
+        working-directory: keycloak
+        run: |
+          ./mvnw clean package \
+              -s ./.github/mvn-rel-settings.xml \
+              -f operator/pom.xml \
+              -DskipTests
+
+      - name: Install Yq
+        working-directory: keycloak
+        run: sudo snap install yq
+
+      - name: Create OLM Bundle
+        working-directory: keycloak
+        run: |
+          cd operator && ./scripts/create-olm-bundle.sh ${{ inputs.version }} ${{ inputs.previous-version }} quay.io/${{ inputs.quay-org }}/keycloak-operator
+
+      - name: Compress OLM Bundle
+        working-directory: keycloak
+        run: |
+          tar --use-compress-program zstd -cf olm-bundle-keycloak.tzst \
+          --exclude '*.tar.gz' \
+          -C operator/olm/${{ inputs.version }} .
+
+      - name: Upload Keycloak OLM bundle
+        uses: actions/upload-artifact@v3
+        with:
+          name: olm-bundle-keycloak.tzst
+          path: keycloak/olm-bundle-keycloak.tzst
+          if-no-files-found: error
+          retention-days: 1
+
+  release-community:
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - name: Clone community-operators
+        uses: actions/checkout@v3
+        with:
+          repository: ${{ inputs.operator-publish-repo-org }}/community-operators
+          path: community-operators
+
+      - name: Download Keycloak OLM bundle
+        uses: actions/download-artifact@v3
+        with:
+          path: community-operators
+          name: olm-bundle-keycloak.tzst
+
+      - name: Push changes to particular Community operators fork
+        working-directory: community-operators
+        run: |
+          git remote add upstream ${{ inputs.community-operators-repo }}
+          git fetch upstream
+          
+          git checkout upstream/main -B releases/${{ inputs.version }}
+          
+          mkdir -p operators/keycloak-operator/${{ inputs.version }}
+          tar -C operators/keycloak-operator/${{ inputs.version }} --use-compress-program="zstd -d" -xf olm-bundle-keycloak.tzst
+          
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          
+          git add .
+          git commit -s -m "Bump Keycloak operator to ${{ inputs.version }}"
+          
+          git push origin HEAD
+
+      - name: Automatic Community PR opening
+        working-directory: community-operators
+        run: |
+          gh pr create --title "Bump Keycloak operator to ${{ inputs.version }}" --fill --repo ${{ inputs.community-operators-repo }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
+  release-product:
+    runs-on: ubuntu-latest
+    needs: [build]
+
+    steps:
+      - name: Clone community-operators-prod
+        uses: actions/checkout@v3
+        with:
+          repository: ${{ inputs.operator-publish-repo-org }}/community-operators-prod
+          path: community-operators-prod
+
+      - name: Download Keycloak OLM bundle
+        uses: actions/download-artifact@v3
+        with:
+          path: community-operators-prod
+          name: olm-bundle-keycloak.tzst
+
+      - name: Push changes to particular Prod operators fork
+        working-directory: community-operators-prod
+        run: |
+          git remote add upstream ${{ inputs.prod-operators-repo }}
+          git fetch upstream
+          
+          git checkout upstream/main -B releases/${{ inputs.version }}
+          
+          mkdir -p operators/keycloak-operator/${{ inputs.version }}
+          tar -C operators/keycloak-operator/${{ inputs.version }} --use-compress-program="zstd -d" -xf olm-bundle-keycloak.tzst
+          
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          
+          git add .
+          git commit -s -m "Bump Keycloak operator to ${{ inputs.version }}"
+          
+          git push origin HEAD  
+
+      - name: Automatic Prod PR opening
+        working-directory: community-operators-prod
+        run: |
+          gh pr create --title "Bump Keycloak operator to ${{ inputs.version }}" --fill --repo ${{ inputs.prod-operators-repo }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}

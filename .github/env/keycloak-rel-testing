@@ -5,3 +5,8 @@ mvn-snapshots-url=https://maven.pkg.github.com/keycloak-rel-testing/maven
 
 quay-org=keycloaktesting
 docker-org=keycloaktesting
+
+operator-publish-repo-org=keycloak-rel-testing
+
+community-operators-repo=https://github.com/keycloak-rel-testing/community-operators.git
+prod-operators-repo=https://github.com/keycloak-rel-testing/community-operators-prod.git

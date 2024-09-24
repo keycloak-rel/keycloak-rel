@@ -4,8 +4,13 @@ on:
   workflow_dispatch:
     inputs:
       branch:
+        description: 'Keycloak branch'
         required: true
       version:
+        description: 'New version'
+        required: true
+      previous-version:
+        description: 'Old version'
         required: true
 
 concurrency: rel-${{ github.ref }}
@@ -22,6 +27,7 @@ jobs:
       - run: |
           echo "Version: ${{ inputs.version }}  " >> $GITHUB_STEP_SUMMARY
           echo "Release branch: ${{ inputs.branch }}  " >> $GITHUB_STEP_SUMMARY
+          echo "Previous Keycloak version: ${{ inputs.previous-version }}  " >> $GITHUB_STEP_SUMMARY
           echo "Workflow branch: ${{ github.ref_name }}  " >> $GITHUB_STEP_SUMMARY
 
   env:
@@ -144,3 +150,21 @@ jobs:
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish-keycloak-operator-hub:
+    name: Publish Keycloak Operator to OperatorHub
+    needs: [ env, create-tags, keycloak-operator ]
+    uses: ./.github/workflows/x-keycloak-operator-hub-publish.yml
+    with:
+      gh-org: ${{ needs.env.outputs.gh-org }}
+      quay-org: ${{ needs.env.outputs.quay-org }}
+      operator-publish-repo-org: ${{ needs.env.outputs.operator-publish-repo-org }}
+      mvn-url: ${{ needs.env.outputs.mvn-releases-url }}
+      version: ${{ github.event.inputs.version }}
+      previous-version: ${{ github.event.inputs.previous-version }}
+      community-operators-repo: ${{ needs.env.outputs.community-operators-repo }}
+      prod-operators-repo: ${{ needs.env.outputs.prod-operators-repo }}
+    secrets:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      MVN_USERNAME: ${{ secrets.MVN_USERNAME }}
+      MVN_TOKEN: ${{ secrets.MVN_TOKEN }}
