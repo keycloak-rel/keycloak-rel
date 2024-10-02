@@ -51,13 +51,13 @@ jobs:
 
     steps:
       - name: Setup Java
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
       - name: Checkout Repository
-        uses: actions/checkout@v3.0.0
+        uses: actions/checkout@v4
         with:
           repository: '${{ inputs.gh-org }}/keycloak'
           token: ${{ secrets.GH_TOKEN }}
@@ -65,14 +65,14 @@ jobs:
           path: keycloak
 
       - name: Setup QEMU
-        uses: docker/setup-qemu-action@v1.2.0
+        uses: docker/setup-qemu-action@v3.0.0
 
       - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v1.6.0
+        uses: docker/setup-buildx-action@v3.3.0
 
       - name: Container metadata
         id: meta
-        uses: docker/metadata-action@v3.6.2
+        uses: docker/metadata-action@v5.0.0
         with:
           images: |
             quay.io/${{ inputs.quay-org }}/keycloak-operator
@@ -84,14 +84,14 @@ jobs:
             type=semver,pattern={{major}}.{{minor}},value=${{ inputs.tag }},enable=${{ inputs.tag != 'nightly' }}
 
       - name: Login to Quay
-        uses: docker/login-action@v1.14.1
+        uses: docker/login-action@v3.2.0
         with:
           registry: quay.io
           username: ${{ secrets.QUAY_USERNAME }}
           password: ${{ secrets.QUAY_TOKEN }}
 
       - name: Login to Docker
-        uses: docker/login-action@v1.14.1
+        uses: docker/login-action@v3.2.0
         with:
           registry: docker.io
           username: ${{ secrets.DOCKER_USERNAME }}
@@ -125,7 +125,7 @@ jobs:
             KEYCLOAK_VERSION=${{ inputs.version }}
 
       - name: Clone k8s resources repository
-        uses: actions/checkout@v3.0.0
+        uses: actions/checkout@v4
         with:
           repository: ${{ inputs.gh-org }}/keycloak-k8s-resources
           path: keycloak-k8s-resources

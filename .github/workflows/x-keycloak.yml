@@ -37,7 +37,7 @@ jobs:
 
     steps:
       - name: Setup Java
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
@@ -48,7 +48,7 @@ jobs:
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
       - name: Checkout Repository
-        uses: actions/checkout@v3.0.0
+        uses: actions/checkout@v4
         with:
           repository: '${{ inputs.gh-org }}/keycloak'
           token: ${{ secrets.GH_TOKEN }}
