@@ -40,6 +40,41 @@ jobs:
         run: git push origin main:release/${{ github.event.inputs.majorMinorVersion }}
         working-directory: keycloak-rel
 
+  create-keycloak-branch:
+    name: Create Keycloak branch
+    runs-on: ubuntu-latest
+    needs: [env]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        repository: '${{ needs.env.outputs.gh-org }}/keycloak'
+        ref: 'main'
+        token: ${{ secrets.GH_TOKEN }}
+
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: temurin
+        java-version: 17
+
+    - name: Create proto.lock files
+      run: ./mvnw install -DskipTests -am -pl model/infinispan -DcommitProtoLockChanges=true
+
+    - name: Create release branch
+      run: git checkout -b release/${{ github.event.inputs.majorMinorVersion }}
+
+    - name: Commit unstaged proto.lock files to branch
+      run: |
+        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git config --global user.name "github-actions[bot]"
+        git add **/proto.lock
+        git commit -s -m "Committing **/proto.lock changes"
+
+    - name: Push release branch
+      run: git push origin release/${{ github.event.inputs.majorMinorVersion }}
+
   create-release-branches:
     name: Create release branch
     runs-on: ubuntu-latest
@@ -48,7 +83,6 @@ jobs:
     strategy:
       matrix:
         repository:
-          - keycloak
           - keycloak-nodejs-connect
           - keycloak-quickstarts
 
