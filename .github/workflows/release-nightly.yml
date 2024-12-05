@@ -102,17 +102,6 @@ jobs:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
 
-  keycloak-quickstarts:
-    name: Keycloak QuickStarts
-    needs: [env, create-tags, keycloak]
-    uses: ./.github/workflows/x-keycloak-quickstarts.yml
-    with:
-      gh-org: ${{ needs.env.outputs.gh-org }}
-      tag: nightly
-      target-branch: nightly
-    secrets:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
-
   publish-gh-releases:
     name: Publish releases
     needs: [env, keycloak, keycloak-nodejs-connect]

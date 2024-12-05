@@ -84,7 +84,6 @@ jobs:
       matrix:
         repository:
           - keycloak-nodejs-connect
-          - keycloak-quickstarts
 
     steps:
     - name: Checkout repository

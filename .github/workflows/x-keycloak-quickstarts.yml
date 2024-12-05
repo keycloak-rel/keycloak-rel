@@ -6,7 +6,7 @@ on:
       gh-org:
         required: true
         type: string
-      tag:
+      server-version:
         required: true
         type: string
       target-branch:
@@ -30,12 +30,17 @@ jobs:
         with:
           repository: '${{ inputs.gh-org }}/keycloak-quickstarts'
           token: ${{ secrets.GH_TOKEN }}
-          ref: ${{ inputs.tag }}
+          ref: ${{ inputs.target-branch }}
 
-      - name: Update branch
+      - name: Set server version
         run: |
-          git switch -C ${{ inputs.target-branch }}
-          git push --force origin refs/heads/${{ inputs.target-branch }}
+          ./set-server-version.sh ${{ inputs.server-version }}
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git commit -a -m "Set server version to ${{ inputs.server-version }}"          
+
+      - name: Push changes
+        run: git push origin ${{ inputs.target-branch }}
 
       - name: Show QuickStart branch
-        run: echo "https://github.com/${{ inputs.gh-org }}/keycloak-quickstarts/tree/${{ inputs.quickstarts-target-branch }}  " >> $GITHUB_STEP_SUMMARY
+        run: echo "https://github.com/${{ inputs.gh-org }}/keycloak-quickstarts/tree/${{ inputs.target-branch }}  " >> $GITHUB_STEP_SUMMARY
