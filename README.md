@@ -8,7 +8,7 @@ The reason for this is to be able to sandbox the release from the regular day to
 
 In addition there is a fork of the above repository that is used for testing purposes:
 
-* [Keycloak release testing repository](https://github.com/keycloak-rel-testing/keycloak-rel-testing)
+* [Keycloak release testing repository](https://github.com/keycloak-rel-testing/keycloak-rel)
 
 The testing fork allows testing releases without affecting regular releases as it uses different credentials and repositories.
 
