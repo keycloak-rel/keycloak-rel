@@ -19,6 +19,17 @@ jobs:
   env:
     uses: ./.github/workflows/x-env.yml
 
+  keycloak-quickstarts:
+    name: Keycloak QuickStarts
+    needs: [env]
+    uses: ./.github/workflows/x-keycloak-quickstarts.yml
+    with:
+      gh-org: ${{ needs.env.outputs.gh-org }}
+      server-version: ${{ github.event.inputs.version }}
+      target-branch: main
+    secrets:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
   update-website:
     name: Update website
     uses: ./.github/workflows/x-keycloak-web.yml

@@ -33,7 +33,6 @@ jobs:
         repository:
           - keycloak
           - keycloak-nodejs-connect
-          - keycloak-quickstarts
 
     steps:
       - name: Checkout repository
@@ -67,5 +66,4 @@ jobs:
     needs: [create-tags]
     steps:
       - run: |
-          echo "https://github.com/${{ inputs.gh-org }}/keycloak/tree/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
-          echo "https://github.com/${{ inputs.gh-org }}/keycloak-quickstarts/tree/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
+          echo "https://github.com/${{ inputs.gh-org }}/keycloak/tree/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY          
