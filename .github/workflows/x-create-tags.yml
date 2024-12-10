@@ -32,7 +32,6 @@ jobs:
       matrix:
         repository:
           - keycloak
-          - keycloak-nodejs-connect
           - keycloak-quickstarts
 
     steps:
