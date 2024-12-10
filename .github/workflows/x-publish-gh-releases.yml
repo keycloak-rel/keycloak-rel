@@ -20,14 +20,9 @@ defaults:
 jobs:
   publish-gh-releases:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        repository:
-          - keycloak
-          - keycloak-nodejs-connect
     steps:
       - name: Publish release
-        run: gh release edit ${{ inputs.tag }} --repo ${{ inputs.gh-org }}/${{ matrix.repository }} --draft=false
+        run: gh release edit ${{ inputs.tag }} --repo ${{ inputs.gh-org }}/keycloak --draft=false
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
@@ -37,5 +32,4 @@ jobs:
     needs: [publish-gh-releases]
     steps:
       - run: |
-          echo "https://github.com/${{ inputs.gh-org }}/keycloak/releases/tag/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
-          echo "https://github.com/${{ inputs.gh-org }}/keycloak-nodejs-connect/releases/tag/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
+          echo "https://github.com/${{ inputs.gh-org }}/keycloak/releases/tag/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY          
