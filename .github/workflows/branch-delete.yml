@@ -50,21 +50,14 @@ jobs:
     needs: [env]
     if: github.event.inputs.majorMinorVersion != 'main' && github.event.inputs.majorMinorVersion == github.event.inputs.majorMinorVersionConfirmation
     continue-on-error: true
-
-    strategy:
-      matrix:
-        repository:
-          - keycloak
-          - keycloak-nodejs-connect
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          repository: '${{ needs.env.outputs.gh-org }}/${{ matrix.repository }}'
+          repository: '${{ needs.env.outputs.gh-org }}/keycloak'
           token: ${{ secrets.GH_TOKEN }}
-          path: ${{ matrix.repository }}
+          path: keycloak
 
       - name: Delete release branch
         run: git push origin :release/${{ github.event.inputs.majorMinorVersion }}
-        working-directory: ${{ matrix.repository }}
+        working-directory: keycloak

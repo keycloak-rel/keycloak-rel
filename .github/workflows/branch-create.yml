@@ -75,25 +75,3 @@ jobs:
     - name: Push release branch
       run: git push origin release/${{ github.event.inputs.majorMinorVersion }}
 
-  create-release-branches:
-    name: Create release branch
-    runs-on: ubuntu-latest
-    needs: [env]
-
-    strategy:
-      matrix:
-        repository:
-          - keycloak-nodejs-connect
-
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-      with:
-        repository: '${{ needs.env.outputs.gh-org }}/${{ matrix.repository }}'
-        ref: 'main'
-        token: ${{ secrets.GH_TOKEN }}
-        path: ${{ matrix.repository }}
-
-    - name: Push release branch
-      run: git push origin main:release/${{ github.event.inputs.majorMinorVersion }}
-      working-directory: ${{ matrix.repository }}
