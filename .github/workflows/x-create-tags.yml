@@ -28,24 +28,18 @@ defaults:
 jobs:
   create-tags:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        repository:
-          - keycloak
-          - keycloak-nodejs-connect
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          repository: "${{ inputs.gh-org }}/${{ matrix.repository }}"
+          repository: "${{ inputs.gh-org }}/keycloak"
           token: ${{ secrets.GH_TOKEN }}
-          path: ${{ matrix.repository }}
+          path: keycloak
           ref: ${{ inputs.branch }}
 
       - name: Create version commit
         if: inputs.set-versions
-        working-directory: ${{ matrix.repository }}
+        working-directory: keycloak
         run: |
           ./set-version.sh ${{ inputs.tag }}
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -53,11 +47,11 @@ jobs:
           git commit -a -m "Set version to ${{ inputs.tag }}"
 
       - name: Tag commit
-        working-directory: ${{ matrix.repository }}
+        working-directory: keycloak
         run: git tag --force ${{ inputs.tag }}
 
       - name: Push changes
-        working-directory: ${{ matrix.repository }}
+        working-directory: keycloak
         run: git push --force origin refs/tags/${{ inputs.tag }}
 
   show-tags:
