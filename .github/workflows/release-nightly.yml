@@ -39,16 +39,6 @@ jobs:
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-  keycloak-nodejs-connect:
-    name: Keycloak Node.js Connect
-    needs: [env, create-tags, create-gh-releases]
-    uses: ./.github/workflows/x-keycloak-nodejs-connect.yml
-    with:
-      gh-org: ${{ needs.env.outputs.gh-org }}
-      tag: nightly
-    secrets:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
-
   keycloak:
     name: Keycloak
     needs: [env, create-tags, create-gh-releases]
@@ -104,7 +94,7 @@ jobs:
 
   publish-gh-releases:
     name: Publish releases
-    needs: [env, keycloak, keycloak-nodejs-connect]
+    needs: [env, keycloak]
     uses: ./.github/workflows/x-publish-gh-releases.yml
     with:
       gh-org: ${{ needs.env.outputs.gh-org }}
