@@ -1,0 +1,114 @@
+name: X Keycloak Operator Hub publish
+
+on:
+  workflow_call:
+    inputs:
+      community-operators-org:
+        required: true
+        type: string
+      prod-operators-org:
+        required: true
+        type: string
+      version:
+        required: true
+        type: string
+      release-bot-email:
+        required: true
+        type: string
+      release-bot-name:
+        required: true
+        type: string
+    secrets:
+      RELEASE_BOT_PRIVATE_KEY:
+        required: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        type: [ community, prod ]
+    steps:
+      - name: Generate a token
+        id: generate-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.RELEASE_BOT_APP_ID }}
+          private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - name: Download Keycloak OLM bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: olm-bundle-keycloak
+
+      - name: Set custom variables
+        run: |
+          if [[ "${{ matrix.type }}" == "community" ]]; then
+            REPO_ORG="${{ inputs.community-operators-org }}"
+            REPO_NAME="community-operators"
+          else
+            REPO_ORG="${{ inputs.prod-operators-org }}"
+            REPO_NAME="community-operators-prod"
+          fi
+
+          echo "repository-org=$REPO_ORG" >> $GITHUB_ENV
+          echo "repository-name=$REPO_NAME" >> $GITHUB_ENV
+          echo "repository-url=https://github.com/$REPO_ORG/$REPO_NAME.git" >> $GITHUB_ENV
+          echo "reviewers=stianst,abstractj,vmuzikar,mabartos" >> $GITHUB_ENV
+
+      - name: Clone community-operators
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/${{ env.repository-name }}
+          path: community-operators
+          token: ${{ steps.generate-token.outputs.token }}
+          persist-credentials: false
+
+      - name: Push changes to particular operators fork
+        working-directory: community-operators
+        env:
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+        run: |
+          git remote set-url origin $(git config remote.origin.url | sed "s/github.com/x-access-token:${{ steps.generate-token.outputs.token }}@github.com/g")
+          git remote add upstream ${{ env.repository-url }}
+          git fetch upstream main
+          
+          git checkout upstream/main -B ${{ inputs.version }}
+          
+          mkdir -p operators/keycloak-operator/${{ inputs.version }}
+          tar -C operators/keycloak-operator/${{ inputs.version }} --use-compress-program="zstd -d" -xf ../olm-bundle-keycloak-${{ inputs.version }}.tzst
+          
+          git add operators/
+          
+          git config user.name '${{ inputs.release-bot-name }}'
+          git config user.email '${{ inputs.release-bot-email }}'
+          
+          git commit -s -m "Keycloak Operator ${{ inputs.version }}"
+          
+          git push -f origin ${{ inputs.version }}
+
+      - name: Automatic PR opening
+        working-directory: community-operators
+        # Once we are okay with the release process, remove reviewers
+        env:
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+        run: |
+          prOpen=$(gh pr view ${{ inputs.version }} -R ${{ env.repository-url }} --json closed --jq '.closed' 2>/dev/null | grep -q false && echo "true" || echo "false")
+          shouldCloseExistingPR=$([[ "${{ inputs.version }}" == "999.0.0-SNAPSHOT" && "$prOpen" == "true" ]] && echo "true" || echo "false")
+          
+          if [[ "$shouldCloseExistingPR" == "true" ]]; then
+            echo "Existing PR for a nightly release will be closed."
+            gh pr close ${{ inputs.version }} -R ${{ env.repository-url }} --comment "Closing this as a new PR for a nightly release will be created."
+            prOpen="false"
+          fi
+          
+          if [[ "$prOpen" == "false" ]]; then
+            gh pr create --title "operator keycloak-operator (${{ inputs.version }})" --repo ${{ env.repository-url }} --base main -F docs/pull_request_template.md --head ${{ env.repository-org }}:${{ inputs.version }} -r ${{ env.reviewers }}
+          else
+            echo "PR already exists, skipping..."
+          fi
