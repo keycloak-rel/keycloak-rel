@@ -5,3 +5,9 @@ mvn-snapshots-url=https://maven.pkg.github.com/keycloak-rel-testing/maven
 
 quay-org=keycloaktesting
 docker-org=keycloaktesting
+
+community-operators-org=keycloak-rel-testing
+prod-operators-org=keycloak-rel-testing
+
+release-bot-email=197090519+keycloak-release-test[bot]@users.noreply.github.com
+release-bot-name=keycloak-release-test[bot]
