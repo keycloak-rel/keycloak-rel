@@ -99,6 +99,6 @@ jobs:
           git push origin main:main
 
       - name: Attach release notes to GH release
-        run: gh release edit --repo keycloak/keycloak --notes-file cache/releases/${{ inputs.version }}/gh-release-notes.html ${{ inputs.version }}
+        run: gh release edit --repo keycloak/keycloak --notes-file cache/releases/keycloak/${{ inputs.version }}/gh-release-notes.html ${{ inputs.version }}
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
