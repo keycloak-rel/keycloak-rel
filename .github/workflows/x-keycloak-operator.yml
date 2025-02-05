@@ -18,6 +18,9 @@ on:
       version:
         required: true
         type: string
+      previous-version:
+        required: true
+        type: string
       tag:
         required: true
         type: string
@@ -123,6 +126,30 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             KEYCLOAK_VERSION=${{ inputs.version }}
+
+      - name: Install Yq
+        working-directory: keycloak
+        run: sudo snap install yq
+
+      - name: Create OLM Bundle
+        working-directory: keycloak
+        run: |
+          cd operator && ./scripts/create-olm-bundle.sh ${{ inputs.version }} ${{ inputs.previous-version }} quay.io/${{ inputs.quay-org }}/keycloak-operator
+
+      - name: Compress OLM Bundle
+        working-directory: keycloak
+        run: |
+          tar --use-compress-program zstd -cf olm-bundle-keycloak-${{ inputs.version }}.tzst \
+          --exclude '*.tar.gz' \
+          -C operator/olm/${{ inputs.version }} .
+
+      - name: Upload Keycloak OLM bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: olm-bundle-keycloak
+          path: keycloak/olm-bundle-keycloak-${{ inputs.version }}.tzst
+          if-no-files-found: error
+          retention-days: 7
 
       - name: Clone k8s resources repository
         uses: actions/checkout@v3.0.0

@@ -18,6 +18,18 @@ on:
       docker-org:
         description: "Docker Organization"
         value: ${{ jobs.env.outputs.docker-org }}
+      community-operators-org:
+        description: "Community operators organization name"
+        value: ${{ jobs.env.outputs.community-operators-org }}
+      prod-operators-org:
+        description: "Product operators organization name"
+        value: ${{ jobs.env.outputs.prod-operators-org }}
+      release-bot-email:
+        description: "Release Bot email"
+        value: ${{ jobs.env.outputs.release-bot-email }}
+      release-bot-name:
+        description: "Release Bot name"
+        value: ${{ jobs.env.outputs.release-bot-name }}
 
 defaults:
   run:
@@ -32,6 +44,10 @@ jobs:
       mvn-snapshots-url: ${{ env.mvn-snapshots-url }}
       quay-org: ${{ env.quay-org }}
       docker-org: ${{ env.docker-org }}
+      community-operators-org: ${{ env.community-operators-org }}
+      prod-operators-org: ${{ env.prod-operators-org }}
+      release-bot-email: ${{ env.release-bot-email }}
+      release-bot-name: ${{ env.release-bot-name }}
     steps:
       - uses: actions/checkout@v3
       - id: load-env

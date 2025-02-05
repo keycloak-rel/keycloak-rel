@@ -5,3 +5,9 @@ mvn-snapshots-url=https://s01.oss.sonatype.org/content/repositories/snapshots/
 
 quay-org=keycloak
 docker-org=keycloak
+
+community-operators-org=k8s-operatorhub
+prod-operators-org=redhat-openshift-ecosystem
+
+release-bot-email=197724792+keycloak-release[bot]@users.noreply.github.com
+release-bot-name=keycloak-release[bot]
