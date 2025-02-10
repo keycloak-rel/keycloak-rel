@@ -29,7 +29,6 @@ jobs:
           - tarball: keycloak-account-ui-${{ inputs.tag }}.tgz
           - tarball: keycloak-ui-shared-${{ inputs.tag }}.tgz
           - tarball: keycloak-admin-client-${{ inputs.tag }}.tgz
-          - tarball: keycloak-js-${{ inputs.tag }}.tgz
     steps:
       - name: Download archive
         run: gh release download ${{ inputs.tag }} --repo ${{ inputs.gh-org }}/keycloak --pattern '${{ matrix.tarball }}'
@@ -59,4 +58,3 @@ jobs:
           echo "https://www.npmjs.com/package/@keycloak/keycloak-admin-ui/v/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
           echo "https://www.npmjs.com/package/@keycloak/keycloak-account-ui/v/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
           echo "https://www.npmjs.com/package/@keycloak/keycloak-ui-shared/v/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
-          echo "https://www.npmjs.com/package/keycloak-js/v/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
