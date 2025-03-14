@@ -23,6 +23,7 @@ jobs:
   publish-npm:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         include:
           - tarball: keycloak-admin-ui-${{ inputs.tag }}.tgz
