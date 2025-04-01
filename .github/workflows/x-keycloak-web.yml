@@ -1,4 +1,4 @@
-name: X Keycloak
+name: X Keycloak Web
 
 on:
   workflow_call:
@@ -6,8 +6,17 @@ on:
       gh-org:
         required: true
         type: string
-      version:
+      server-version:
         required: true
+        default: skip
+        type: string
+      js-version:
+        required: true
+        default: skip
+        type: string
+      client-version:
+        required: true
+        default: skip
         type: string
     secrets:
       GH_TOKEN:
@@ -28,30 +37,32 @@ jobs:
           repository: '${{ inputs.gh-org }}/keycloak.github.io'
           token: ${{ secrets.GH_TOKEN }}
 
-      - name: Download api-docs
+      - name: Download api-docs for server release
+        if: ${{ inputs.server-version != 'skip' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          gh release -R ${{ inputs.gh-org }}/keycloak download ${{ inputs.version }} -p keycloak-api-docs-${{ inputs.version }}.zip
-          unzip keycloak-api-docs-${{ inputs.version }}.zip
-          rm keycloak-api-docs-${{ inputs.version }}.zip
-          mv keycloak-api-docs-${{ inputs.version }} docs-api/${{ inputs.version }}
+          gh release -R ${{ inputs.gh-org }}/keycloak download ${{ inputs.server-version }} -p keycloak-api-docs-${{ inputs.server-version }}.zip
+          unzip keycloak-api-docs-${{ inputs.server-version }}.zip
+          rm keycloak-api-docs-${{ inputs.server-version }}.zip
+          mv keycloak-api-docs-${{ inputs.server-version }} docs-api/${{ inputs.server-version }}
 
           cd docs-api
           rm latest
-          ln -s ${{ inputs.version }} latest
-      - name: Download documentation
+          ln -s ${{ inputs.server-version }} latest
+      - name: Download documentation for server release
+        if: ${{ inputs.server-version != 'skip' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          gh release -R ${{ inputs.gh-org }}/keycloak download ${{ inputs.version }} -p keycloak-documentation-${{ inputs.version }}.zip
-          unzip keycloak-documentation-${{ inputs.version }}.zip
-          rm keycloak-documentation-${{ inputs.version }}.zip
-          mv keycloak-documentation-${{ inputs.version }} docs/${{ inputs.version }}
+          gh release -R ${{ inputs.gh-org }}/keycloak download ${{ inputs.server-version }} -p keycloak-documentation-${{ inputs.server-version }}.zip
+          unzip keycloak-documentation-${{ inputs.server-version }}.zip
+          rm keycloak-documentation-${{ inputs.server-version }}.zip
+          mv keycloak-documentation-${{ inputs.server-version }} docs/${{ inputs.server-version }}
 
           cd docs
           rm latest
-          ln -s ${{ inputs.version }} latest
+          ln -s ${{ inputs.server-version }} latest
       - name: Commit to repository
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -59,12 +70,12 @@ jobs:
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
 
-          git add docs/${{ inputs.version }}
+          git add docs/${{ inputs.server-version }}
           git add docs/latest
-          git add docs-api/${{ inputs.version }}
+          git add docs-api/${{ inputs.server-version }}
           git add docs-api/latest
 
-          git commit -m "Documentation for ${{ inputs.version }}"
+          git commit -m "Documentation for ${{ inputs.server-version }}"
           git push origin main:main
 
   add-version:
@@ -84,8 +95,27 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Add version
-        run: ./add-version.sh ${{ inputs.version }}
+      - name: Add version server
+        if: ${{ inputs.server-version != 'skip' }}
+        run: |
+          ./add-version.sh ${{ inputs.server-version }}
+          echo "SERVER_COMMIT_MSG=Keycloak ${{ inputs.server-version }} release" >> $GITHUB_ENV
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Add version keycloak-js
+        if: ${{ inputs.js-version != 'skip' }}
+        run: |
+          ./add-version.sh ${{ inputs.js-version }} keycloak-js
+          echo "JS_COMMIT_MSG=Keycloak JS ${{ inputs.js-version }} release" >> $GITHUB_ENV
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Add version keycloak-client
+        if: ${{ inputs.client-version != 'skip' }}
+        run: |
+          ./add-version.sh ${{ inputs.client-version }} keycloak-client
+          echo "CLIENT_COMMIT_MSG=Keycloak Client Libs ${{ inputs.client-version }} release" >> $GITHUB_ENV
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
@@ -95,10 +125,11 @@ jobs:
           git config --global user.name "github-actions[bot]"
 
           git add --all
-          git commit -m "Keycloak ${{ inputs.version }} release"
+          git commit -m "$SERVER_COMMIT_MSG\n$JS_COMMIT_MSG\n$CLIENT_COMMIT"
           git push origin main:main
 
-      - name: Attach release notes to GH release
-        run: gh release edit --repo keycloak/keycloak --notes-file cache/releases/keycloak/${{ inputs.version }}/gh-release-notes.html ${{ inputs.version }}
+      - name: Attach Keycloak Server release notes to GH release
+        if: ${{ inputs.server-version != 'skip' }}
+        run: gh release edit --repo keycloak/keycloak --notes-file cache/releases/keycloak/${{ inputs.server-version }}/gh-release-notes.html ${{ inputs.server-version }}
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
