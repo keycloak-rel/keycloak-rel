@@ -3,8 +3,19 @@ name: Announce Release
 on:
   workflow_dispatch:
     inputs:
-      version:
+      component:
+        description: 'What component release do you want to announce?'
         required: true
+        type: choice
+        options:
+          - keycloak-server
+          - keycloak-js
+          - keycloak-client
+          - keycloak-nodejs-connect
+      version:
+        description: 'Version of the component to announce'
+        required: true
+        type: string
 
 concurrency: rel-${{ github.ref }}
 
@@ -14,6 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
+          echo "Anouncing release of ${{ inputs.component }}  " >> $GITHUB_STEP_SUMMARY
           echo "Version: ${{ inputs.version }}  " >> $GITHUB_STEP_SUMMARY
 
   env:
@@ -25,7 +37,8 @@ jobs:
     uses: ./.github/workflows/x-keycloak-quickstarts.yml
     with:
       gh-org: ${{ needs.env.outputs.gh-org }}
-      server-version: ${{ github.event.inputs.version }}
+      component: ${{ github.event.inputs.component }}
+      version: ${{ github.event.inputs.version }}
       target-branch: main
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -36,6 +49,7 @@ jobs:
     needs: [env]
     with:
       gh-org: ${{ needs.env.outputs.gh-org }}
+      component: ${{ github.event.inputs.component }}
       version: ${{ github.event.inputs.version }}
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}

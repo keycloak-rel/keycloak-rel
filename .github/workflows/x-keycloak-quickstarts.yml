@@ -6,7 +6,10 @@ on:
       gh-org:
         required: true
         type: string
-      server-version:
+      component:
+        required: true
+        type: string
+      version:
         required: true
         type: string
       target-branch:
@@ -32,12 +35,34 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
           ref: ${{ inputs.target-branch }}
 
-      - name: Set server version
+      - name: Set version for the released component
         run: |
-          ./set-server-version.sh ${{ inputs.server-version }}
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
-          git commit -a -m "Set server version to ${{ inputs.server-version }}"          
+          if [[ "${{ inputs.component }}" == "keycloak-server" ]]; then
+            ./set-server-version.sh ${{ inputs.version }}
+            git commit -a -m "Set server version to ${{ inputs.version }}"          
+            echo "${{ inputs.component }} version set to ${{ inputs.version }}  " >> $GITHUB_STEP_SUMMARY
+          elif [[ "${{ inputs.component }}" == "keycloak-js" ]]; then
+            ./set-js-version.sh ${{ inputs.version }}
+            git commit -a -m "Set keycloak-js version to ${{ inputs.version }}"
+            echo "${{ inputs.component }} version set to ${{ inputs.version }}  " >> $GITHUB_STEP_SUMMARY
+          elif [[ "${{ inputs.component }}" == "keycloak-client" ]]; then
+            ./set-client-version.sh ${{ inputs.version }}
+            git commit -a -m "Set keycloak client libs version to ${{ inputs.version }}"          
+            echo "${{ inputs.component }} version set to ${{ inputs.version }}  " >> $GITHUB_STEP_SUMMARY
+          elif [[ "${{ inputs.component }}" == "keycloak-nodejs-connect" ]]; then
+            if [ -f ./set-nodejs-connect-version.sh ]; then
+              ./set-nodejs-connect-version.sh ${{ inputs.version }}
+              git commit -a -m "Set keycloak client libs version to ${{ inputs.version }}"
+              echo "${{ inputs.component }} version set to ${{ inputs.version }}  " >> $GITHUB_STEP_SUMMARY
+            else
+              echo "${{ inputs.component }} set script not found. Ignoring this part. " >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "Announce of component '${{ inputs.component }}' is not supported." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
 
       - name: Push changes
         run: git push origin ${{ inputs.target-branch }}
