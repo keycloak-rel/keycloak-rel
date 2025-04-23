@@ -108,7 +108,7 @@ jobs:
           fi
           
           if [[ "$prOpen" == "false" ]]; then
-            gh pr create --title "operator keycloak-operator (${{ inputs.version }})" --repo ${{ env.repository-url }} --base main -F docs/pull_request_template.md --head ${{ env.repository-org }}:${{ inputs.version }} -r ${{ env.reviewers }}
+            gh pr create --title "operator keycloak-operator (${{ inputs.version }})" --repo ${{ env.repository-url }} --base main -F docs/pull_request_template.md --head ${{ github.repository_owner }}:${{ inputs.version }} -r ${{ env.reviewers }}
           else
             echo "PR already exists, skipping..."
           fi
