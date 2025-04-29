@@ -3,8 +3,21 @@ name: Announce Release
 on:
   workflow_dispatch:
     inputs:
-      version:
+      server-version:
+        description: Version of Keycloak Server released in keycloak/keycloak repository
         required: true
+        default: skip
+        type: string
+      js-version:
+        description: Version of Keycloak JS released in keycloak/keycloak-js repository
+        required: true
+        default: skip
+        type: string
+      client-version:
+        description: Version of Keycloak Client Libs released in keycloak/keycloak-client repository
+        required: true
+        default: skip
+        type: string
 
 concurrency: rel-${{ github.ref }}
 
@@ -14,7 +27,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          echo "Version: ${{ inputs.version }}  " >> $GITHUB_STEP_SUMMARY
+          echo "Server version: ${{ inputs.server-version }}  " >> $GITHUB_STEP_SUMMARY
+          echo "JS version: ${{ inputs.js-version }}  " >> $GITHUB_STEP_SUMMARY
+          echo "Client Libs version: ${{ inputs.client-version }}  " >> $GITHUB_STEP_SUMMARY
 
   env:
     uses: ./.github/workflows/x-env.yml
@@ -25,7 +40,9 @@ jobs:
     uses: ./.github/workflows/x-keycloak-quickstarts.yml
     with:
       gh-org: ${{ needs.env.outputs.gh-org }}
-      server-version: ${{ github.event.inputs.version }}
+      server-version: ${{ github.event.inputs.server-version }}
+      js-version: ${{ github.event.inputs.js-version }}
+      client-version: ${{ github.event.inputs.client-version }}
       target-branch: main
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -36,6 +53,8 @@ jobs:
     needs: [env]
     with:
       gh-org: ${{ needs.env.outputs.gh-org }}
-      version: ${{ github.event.inputs.version }}
+      server-version: ${{ github.event.inputs.server-version }}
+      js-version: ${{ github.event.inputs.js-version }}
+      client-version: ${{ github.event.inputs.client-version }}
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
