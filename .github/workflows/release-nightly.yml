@@ -45,7 +45,7 @@ jobs:
     uses: ./.github/workflows/x-keycloak.yml
     with:
       gh-org: ${{ needs.env.outputs.gh-org }}
-      mvn-url: ${{ needs.env.outputs.mvn-snapshots-url }}
+      mvn-deploy-options: ${{ needs.env.outputs.mvn-deploy-options }}
       version: 999.0.0-SNAPSHOT
       tag: nightly
     secrets:
@@ -80,14 +80,11 @@ jobs:
       gh-org: ${{ needs.env.outputs.gh-org }}
       quay-org: ${{ needs.env.outputs.quay-org }}
       docker-org: ${{ needs.env.outputs.docker-org }}
-      mvn-url: ${{ needs.env.outputs.mvn-snapshots-url }}
       version: 999.0.0-SNAPSHOT
       previous-version: 998.0.0-SNAPSHOT
       tag: nightly
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      MVN_USERNAME: ${{ secrets.MVN_USERNAME }}
-      MVN_TOKEN: ${{ secrets.MVN_TOKEN }}
       QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
       QUAY_TOKEN: ${{ secrets.QUAY_TOKEN }}
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}

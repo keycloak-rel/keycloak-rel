@@ -12,9 +12,6 @@ on:
       docker-org:
         required: true
         type: string
-      mvn-url:
-        required: true
-        type: string
       version:
         required: true
         type: string
@@ -30,10 +27,6 @@ on:
         type: string
     secrets:
       GH_TOKEN:
-        required: true
-      MVN_USERNAME:
-        required: true
-      MVN_TOKEN:
         required: true
       QUAY_USERNAME:
         required: true
@@ -100,17 +93,15 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
+      - name: Build Keycloak Core
+        working-directory: keycloak
+        run: ./mvnw -am -pl core install -DskipTests
+
       - name: Build Operator
-        env:
-          MAVEN_ID: kc-rel-repository
-          MAVEN_URL: ${{ inputs.mvn-url }}
-          MAVEN_USERNAME: ${{ secrets.MVN_USERNAME }}
-          MAVEN_PASSWORD: ${{ secrets.MVN_TOKEN }}
         working-directory: keycloak
         # hardcoded Quay.io image coordinates here are used only for building the K8s YAML resources (where we use Quay and not Docker Hub)
         run: |
           ./mvnw -B clean package \
-              -s ./.github/mvn-rel-settings.xml \
               -f operator/pom.xml \
               -DskipTests \
               -Dquarkus.container-image.image=quay.io/${{ inputs.quay-org }}/keycloak-operator:${{ inputs.tag }} \
