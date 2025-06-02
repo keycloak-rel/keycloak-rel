@@ -54,9 +54,6 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
           ref: ${{ inputs.tag }}
 
-      - name: Echo env
-        run: echo "options=${{ inputs.mvn-deploy-options }}"
-
       - name: Deploy to Maven
         env:
           MAVEN_ID: kc-rel-repository
