@@ -8,6 +8,15 @@ on:
         type: string
       server-version:
         required: true
+        default: skip
+        type: string
+      js-version:
+        required: true
+        default: skip
+        type: string
+      client-version:
+        required: true
+        default: skip
         type: string
       target-branch:
         required: true
@@ -32,12 +41,22 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
           ref: ${{ inputs.target-branch }}
 
-      - name: Set server version
+      - name: Set version for server or js
         run: |
-          ./set-server-version.sh ${{ inputs.server-version }}
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
-          git commit -a -m "Set server version to ${{ inputs.server-version }}"          
+          if [[ "${{ inputs.server-version }}" != "skip" ]]; then
+            ./set-server-version.sh ${{ inputs.server-version }}
+            git commit -a -m "Set server version to ${{ inputs.server-version }}"          
+          fi
+          if [[ "${{ inputs.js-version }}" != "skip" ]]; then
+            ./set-js-version.sh ${{ inputs.js-version }}
+            git commit -a -m "Set keycloak-js version to ${{ inputs.js-version }}"          
+          fi
+          if [[ "${{ inputs.client-version }}" != "skip" ]]; then
+            ./set-client-version.sh ${{ inputs.client-version }}
+            git commit -a -m "Set keycloak client libs version to ${{ inputs.client-version }}"          
+          fi
 
       - name: Push changes
         run: git push origin ${{ inputs.target-branch }}
