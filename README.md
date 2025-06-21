@@ -123,6 +123,22 @@ Nightly release uses `nightly` tag.
 |Keycloak|https://quay.io/repository/keycloak/keycloak|https://quay.io/repository/keycloak/keycloak|https://quay.io/repository/keycloaktesting/keycloak|
 |Operator|https://quay.io/repository/keycloak/keycloak-operator|https://quay.io/repository/keycloak/keycloak|https://quay.io/repository/keycloaktesting/keycloak-operator|
 
+### Respinning Container Images
+
+When a CVE is discovered in the dependencies of our container images, a respin may be required to incorporate security fixes. Follow these steps to trigger the respin:
+
+1. **Access the Re-spin Containers Workflow**  
+    Navigate to the [Re-spin Containers GitHub Action](https://github.com/keycloak-rel/keycloak-rel/actions/workflows/respin-containers.yml).
+    
+2. **Run the Workflow**
+    
+    - Click **Run Workflow** and fill in the required fields.
+    - **Branch Name**: Enter the branch name in the format `release/<version>`. Example: `release/26.0`.
+    - **Latest Patch Release**: Provide the latest patch release for the given branch. Ensure that you are selecting the most recent patch version. Example: `26.0.8`.
+3. **Select the Container Repository**  
+    Choose the container repository that requires the respin.
+    
+
 ## K8s resources
 
 |Main|Test|
