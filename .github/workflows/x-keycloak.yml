@@ -62,7 +62,7 @@ jobs:
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
           MVN_HTTP_CONFIG="-Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.http.retryHandler.class=standard -Dmaven.wagon.http.retryHandler.count=3 -Dmaven.wagon.httpconnectionManager.ttlSeconds=120"
-          ./mvnw -nsu -B -Pgpg,jboss-release,distribution-downloads,all ${{ inputs.mvn-deploy-options }} -DskipTests -DskipTestsuite $MVN_HTTP_CONFIG clean deploy | tee deploy.log
+          ./mvnw -nsu -B -Pgpg,jboss-release,distribution-downloads,all ${{ inputs.mvn-deploy-options }} -DskipTests -DskipTestsuite -DskipProjectTests $MVN_HTTP_CONFIG clean deploy | tee deploy.log
 
       - name: Show Maven artifacts
         run: |
