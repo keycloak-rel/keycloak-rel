@@ -72,6 +72,13 @@ jobs:
         run: |
           find ./distribution/downloads/target 
 
+      - name: Upload missing tgz to GitHub Releases
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          cd ./distribution/downloads/target
+          gh release upload ${{ inputs.tag }} ${{ inputs.version }}/*.tgz --clobber
+
       - name: Show GitHub Release artifacts
         run: |
           ls ./distribution/downloads/target/${{ inputs.version }}/ | grep -v '.md5$' | grep -v '.sha1$' | sort | xargs -I {} echo "https://github.com/keycloak/keycloak/releases/download/${{ inputs.version }}/{}  " >> $GITHUB_STEP_SUMMARY
