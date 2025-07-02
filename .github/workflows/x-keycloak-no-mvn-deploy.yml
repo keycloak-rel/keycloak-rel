@@ -1,0 +1,77 @@
+name: X Keycloak No mvn deploy
+
+on:
+  workflow_call:
+    inputs:
+      gh-org:
+        required: true
+        type: string
+      mvn-deploy-options:
+        required: true
+        type: string
+      version:
+        required: true
+        type: string
+      tag:
+        required: true
+        type: string
+    secrets:
+      GH_TOKEN:
+        required: true
+      MVN_USERNAME:
+        required: true
+      MVN_TOKEN:
+        required: true
+      GPG_PASSPHRASE:
+        required: true
+      GPG_PRIVATE_KEY:
+        required: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 17
+          server-id: keycloak-publish
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+
+      - name: Checkout Repository
+        uses: actions/checkout@v3.0.0
+        with:
+          repository: '${{ inputs.gh-org }}/keycloak'
+          token: ${{ secrets.GH_TOKEN }}
+          ref: ${{ inputs.tag }}
+
+      - name: Deploy to Maven
+        env:
+          MAVEN_ID: kc-rel-repository
+          MAVEN_USERNAME: ${{ secrets.MVN_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.MVN_TOKEN }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          MVN_HTTP_CONFIG="-Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.http.retryHandler.class=standard -Dmaven.wagon.http.retryHandler.count=3 -Dmaven.wagon.httpconnectionManager.ttlSeconds=120"
+          ./mvnw -nsu -B -Pgpg,jboss-release,distribution-downloads,all ${{ inputs.mvn-deploy-options }} -DskipTests -DskipTestsuite $MVN_HTTP_CONFIG clean install | tee deploy.log
+
+      # show maven artifacts removed
+
+      - name: List what is released
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          find ./distribution/downloads/target 
+
+      - name: Show GitHub Release artifacts
+        run: |
+          ls ./distribution/downloads/target/${{ inputs.version }}/ | grep -v '.md5$' | grep -v '.sha1$' | sort | xargs -I {} echo "https://github.com/keycloak/keycloak/releases/download/${{ inputs.version }}/{}  " >> $GITHUB_STEP_SUMMARY
