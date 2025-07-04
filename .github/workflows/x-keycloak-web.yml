@@ -123,11 +123,11 @@ jobs:
           elif [[ "${{ inputs.component }}" == "keycloak-js" ]]; then
             gh release edit --repo keycloak/keycloak-js --notes-file cache/releases/keycloak-js/${{ inputs.version }}/gh-release-notes.html ${{ inputs.version }}
           elif [[ "${{ inputs.component }}" == "keycloak-client" ]]; then
-            gh release edit --repo keycloak/keycloak-client --notes-file cache/releases/keycloak-client/${{ inputs.version }}/gh-release-notes.html ${{ inputs.version }}
+            echo "${{ inputs.component } is not using Github Release feature. Skipping ..." >> $GITHUB_STEP_SUMMARY
           elif [[ "${{ inputs.component }}" == "keycloak-nodejs-connect" ]]; then
             gh release edit --repo keycloak/keycloak-nodejs-connect --notes-file cache/releases/keycloak-nodejs-connect/${{ inputs.version }}/gh-release-notes.html ${{ inputs.version }}
           else
-            echo "Attache release notes of the component '${{ inputs.component }}' is not supported." >> $GITHUB_STEP_SUMMARY
+            echo "Attach release notes of the component '${{ inputs.component }}' is not supported." >> $GITHUB_STEP_SUMMARY
             exit 1
           fi
         env:
