@@ -45,20 +45,20 @@ jobs:
   #   secrets:
   #     GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-  # create-gh-releases:
-  #   name: Create Github releases
-  #   needs: [env, create-tags]
-  #   uses: ./.github/workflows/x-create-gh-releases.yml
-  #   with:
-  #     gh-org: ${{ needs.env.outputs.gh-org }}
-  #     tag: ${{ github.event.inputs.version }}
-  #     prerelease: false
-  #   secrets:
-  #     GH_TOKEN: ${{ secrets.GH_TOKEN }}
+  create-gh-releases:
+    name: Create Github releases
+    needs: [env]
+    uses: ./.github/workflows/x-create-gh-releases.yml
+    with:
+      gh-org: ${{ needs.env.outputs.gh-org }}
+      tag: ${{ github.event.inputs.version }}
+      prerelease: false
+    secrets:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
   keycloak:
     name: Keycloak
-    needs: [env]
+    needs: [env, create-gh-releases]
     uses: ./.github/workflows/x-keycloak.yml
     with:
       gh-org: ${{ needs.env.outputs.gh-org }}
