@@ -33,48 +33,48 @@ jobs:
   env:
     uses: ./.github/workflows/x-env.yml
 
-  create-tags:
-    name: Create tags
-    needs: [env]
-    uses: ./.github/workflows/x-create-tags.yml
-    with:
-      gh-org: ${{ needs.env.outputs.gh-org }}
-      tag: ${{ github.event.inputs.version }}
-      branch: ${{ github.event.inputs.branch }}
-      set-versions: true
-    secrets:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+  # create-tags:
+  #   name: Create tags
+  #   needs: [env]
+  #   uses: ./.github/workflows/x-create-tags.yml
+  #   with:
+  #     gh-org: ${{ needs.env.outputs.gh-org }}
+  #     tag: ${{ github.event.inputs.version }}
+  #     branch: ${{ github.event.inputs.branch }}
+  #     set-versions: true
+  #   secrets:
+  #     GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-  create-gh-releases:
-    name: Create Github releases
-    needs: [env, create-tags]
-    uses: ./.github/workflows/x-create-gh-releases.yml
-    with:
-      gh-org: ${{ needs.env.outputs.gh-org }}
-      tag: ${{ github.event.inputs.version }}
-      prerelease: false
-    secrets:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+  # create-gh-releases:
+  #   name: Create Github releases
+  #   needs: [env, create-tags]
+  #   uses: ./.github/workflows/x-create-gh-releases.yml
+  #   with:
+  #     gh-org: ${{ needs.env.outputs.gh-org }}
+  #     tag: ${{ github.event.inputs.version }}
+  #     prerelease: false
+  #   secrets:
+  #     GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-  keycloak:
-    name: Keycloak
-    needs: [env, create-tags, create-gh-releases]
-    uses: ./.github/workflows/x-keycloak.yml
-    with:
-      gh-org: ${{ needs.env.outputs.gh-org }}
-      mvn-deploy-options: ${{ needs.env.outputs.mvn-deploy-options }}
-      version: ${{ github.event.inputs.version }}
-      tag: ${{ github.event.inputs.version }}
-    secrets:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      MVN_USERNAME: ${{ secrets.MVN_USERNAME }}
-      MVN_TOKEN: ${{ secrets.MVN_TOKEN }}
-      GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-      GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+  # keycloak:
+  #   name: Keycloak
+  #   needs: [env]
+  #   uses: ./.github/workflows/x-keycloak.yml
+  #   with:
+  #     gh-org: ${{ needs.env.outputs.gh-org }}
+  #     mvn-deploy-options: ${{ needs.env.outputs.mvn-deploy-options }}
+  #     version: ${{ github.event.inputs.version }}
+  #     tag: ${{ github.event.inputs.version }}
+  #   secrets:
+  #     GH_TOKEN: ${{ secrets.GH_TOKEN }}
+  #     MVN_USERNAME: ${{ secrets.MVN_USERNAME }}
+  #     MVN_TOKEN: ${{ secrets.MVN_TOKEN }}
+  #     GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+  #     GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
 
   keycloak-container:
     name: Keycloak Container
-    needs: [env, create-tags, keycloak]
+    needs: [env]
     uses: ./.github/workflows/x-keycloak-container.yml
     with:
       gh-org: ${{ needs.env.outputs.gh-org }}
@@ -91,7 +91,7 @@ jobs:
 
   keycloak-operator:
     name: Keycloak Operator
-    needs: [env, create-tags,keycloak-container]
+    needs: [env,keycloak-container]
     uses: ./.github/workflows/x-keycloak-operator.yml
     with:
       gh-org: ${{ needs.env.outputs.gh-org }}
@@ -122,7 +122,7 @@ jobs:
 
   publish-gh-releases:
     name: Publish releases
-    needs: [ env, keycloak ]
+    needs: [ env ]
     uses: ./.github/workflows/x-publish-gh-releases.yml
     with:
       gh-org: ${{ needs.env.outputs.gh-org }}
@@ -132,7 +132,7 @@ jobs:
 
   publish-npm:
     name: Publish NPM packages
-    needs: [ env, keycloak ]
+    needs: [ env ]
     uses: ./.github/workflows/x-publish-npm.yml
     with:
       gh-org: ${{ needs.env.outputs.gh-org }}
