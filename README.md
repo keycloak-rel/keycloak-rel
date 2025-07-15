@@ -20,6 +20,7 @@ The testing fork allows testing releases without affecting regular releases as i
 * **Re-spin Containers**: Used to re-spin containers to update the base images without an actual Keycloak release
 * **Release**: Performs a regular Keycloak release
 * **Release Nightly**: Performs a nightly scratch release
+* **General Tag**: Create general tag on a release branch with no other actions
 * **Sync forks**: Only used in testing fork to sync forked repositories
 * **X ...**: Workflows prefixed with *X* are reusable workflows, called by other workflows and should not be executed directly
 

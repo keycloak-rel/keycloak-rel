@@ -1,0 +1,42 @@
+name: General Tag
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Keycloak branch'
+        required: true
+      version:
+        description: 'New version'
+        required: true
+
+concurrency: rel-${{ github.ref }}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+
+  show-inputs:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "Version: ${{ inputs.version }}  " >> $GITHUB_STEP_SUMMARY
+          echo "Release branch: ${{ inputs.branch }}  " >> $GITHUB_STEP_SUMMARY
+          echo "Workflow branch: ${{ github.ref_name }}  " >> $GITHUB_STEP_SUMMARY
+
+  env:
+    uses: ./.github/workflows/x-env.yml
+
+  create-tags:
+    name: Create tags
+    needs: [env]
+    uses: ./.github/workflows/x-create-tags.yml
+    with:
+      gh-org: ${{ needs.env.outputs.gh-org }}
+      tag: ${{ github.event.inputs.version }}
+      branch: ${{ github.event.inputs.branch }}
+      set-versions: true
+    secrets:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
