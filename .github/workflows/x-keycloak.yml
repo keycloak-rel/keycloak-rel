@@ -66,7 +66,7 @@ jobs:
 
       - name: Show Maven artifacts
         run: |
-          cat deploy.log | grep "central-staging/" | grep -v '.xml$' | grep -v '.asc$' | grep -v '.pom$' | grep -v 'javadoc.jar$' | grep -v 'sources.jar$' | grep -v 'source-release.zip' | grep -v 'central-bundle.zip' | grep -o "/central-staging/.*" | grep -o "/org/keycloak/.*" >> $GITHUB_STEP_SUMMARY
+          cat deploy.log | grep -o "/central-.*/.*" | grep -v '.xml$' | grep -v '.asc$' | grep -v '.pom$' | grep -v 'javadoc.jar$' | grep -v 'sources.jar$' | grep -v 'source-release.zip' | grep -v 'central-bundle.zip' | grep -o "/org/keycloak/.*" >> $GITHUB_STEP_SUMMARY
 
       - name: Upload to GitHub Releases
         env:
