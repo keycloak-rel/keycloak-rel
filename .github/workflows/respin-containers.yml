@@ -6,11 +6,15 @@ on:
       version:
         description: 'The version to respin'
         required: true
+      previous-version:
+        description: 'Old version'
+        required: true
       repository:
         description: 'The container repository to respin'
         required: true
         type: choice
         options:
+          - all
           - keycloak
           - keycloak-operator
 
@@ -57,7 +61,7 @@ jobs:
     name: Keycloak Container
     uses: ./.github/workflows/x-keycloak-container.yml
     needs: [env, respin-number]
-    if: inputs.repository == 'keycloak'
+    if: inputs.repository == 'keycloak' || inputs.repository == 'all'
     with:
       gh-org: ${{ needs.env.outputs.gh-org }}
       quay-org: ${{ needs.env.outputs.quay-org }}
@@ -76,19 +80,17 @@ jobs:
     name: Keycloak Operator
     uses: ./.github/workflows/x-keycloak-operator.yml
     needs: [env, respin-number]
-    if: inputs.repository == 'keycloak-operator'
+    if: inputs.repository == 'keycloak-operator' || inputs.repository == 'all'
     with:
       gh-org: ${{ needs.env.outputs.gh-org }}
       quay-org: ${{ needs.env.outputs.quay-org }}
       docker-org: ${{ needs.env.outputs.docker-org }}
-      mvn-url: ${{ needs.env.outputs.mvn-releases-url }}
       version: ${{ github.event.inputs.version }}
+      previous-version: ${{ github.event.inputs.previous-version }}
       tag: ${{ github.event.inputs.version }}
       respin: ${{ needs.respin-number.outputs.respin }}
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      MVN_USERNAME: ${{ secrets.MVN_USERNAME }}
-      MVN_TOKEN: ${{ secrets.MVN_TOKEN }}
       QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
       QUAY_TOKEN: ${{ secrets.QUAY_TOKEN }}
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
