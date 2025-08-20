@@ -59,7 +59,7 @@ jobs:
           echo "repository-org=$REPO_ORG" >> $GITHUB_ENV
           echo "repository-name=$REPO_NAME" >> $GITHUB_ENV
           echo "repository-url=https://github.com/$REPO_ORG/$REPO_NAME.git" >> $GITHUB_ENV
-          echo "reviewers=stianst,abstractj,vmuzikar,mabartos" >> $GITHUB_ENV
+          echo "reviewers=vmuzikar,mabartos,Pepo48,shawkins" >> $GITHUB_ENV
 
       - name: Clone community-operators
         uses: actions/checkout@v4
@@ -94,7 +94,8 @@ jobs:
 
       - name: Automatic PR opening
         working-directory: community-operators
-        # Once we are okay with the release process, remove reviewers
+        if: false # We disable automatic PR opening now as there are failures like: pull request create failed: GraphQL: Resource not accessible by integration (createPullRequest)
+        # Once we are okay with the release process, remove reviewers -> EDIT: reviewers removed for now as users cannot be found
         env:
           GH_TOKEN: ${{ steps.generate-token.outputs.token }}
         run: |
@@ -108,7 +109,7 @@ jobs:
           fi
           
           if [[ "$prOpen" == "false" ]]; then
-            gh pr create --title "operator keycloak-operator (${{ inputs.version }})" --repo ${{ env.repository-url }} --base main -F docs/pull_request_template.md --head ${{ github.repository_owner }}:${{ inputs.version }} -r ${{ env.reviewers }}
+            gh pr create --title "operator keycloak-operator (${{ inputs.version }})" --repo ${{ env.repository-url }} --base main -F docs/pull_request_template.md --head ${{ github.repository_owner }}:${{ inputs.version }}
           else
             echo "PR already exists, skipping..."
           fi
