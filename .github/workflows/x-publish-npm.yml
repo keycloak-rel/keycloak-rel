@@ -31,8 +31,16 @@ jobs:
           - tarball: keycloak-ui-shared-${{ inputs.tag }}.tgz
           - tarball: keycloak-admin-client-${{ inputs.tag }}.tgz
     steps:
+      - name: Checkout scripts repository to the runner
+        uses: actions/checkout@v3
+        with:
+          repository: "${{ inputs.gh-org }}/keycloak-rel"
+          token: ${{ secrets.GH_TOKEN }}
+          path: keycloak-rel
+
       - name: Download archive
-        run: gh release download ${{ inputs.tag }} --repo ${{ inputs.gh-org }}/keycloak --pattern '${{ matrix.tarball }}'
+        run: |
+          $GITHUB_WORKSPACE/keycloak-rel/.github/scripts/retry.sh "gh release download ${{ inputs.tag }} --repo ${{ inputs.gh-org }}/keycloak --pattern '${{ matrix.tarball }}'"
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
