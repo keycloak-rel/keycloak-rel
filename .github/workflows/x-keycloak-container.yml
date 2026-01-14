@@ -43,12 +43,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout scripts repository to the runner
+        uses: actions/checkout@v3
+        with:
+          repository: "${{ inputs.gh-org }}/keycloak-rel"
+          token: ${{ secrets.GH_TOKEN }}
+          path: keycloak-rel
+
       - name: Checkout Repository
-        uses: actions/checkout@v3.0.0
+        uses: actions/checkout@v3
         with:
           repository: '${{ inputs.gh-org }}/keycloak'
           token: ${{ secrets.GH_TOKEN }}
           ref: ${{ inputs.tag }}
+          path: keycloak
 
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v1.2.0
@@ -86,13 +94,14 @@ jobs:
       - name: Download Keycloak
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        working-directory: keycloak
         run: |
-          gh release download -R ${{ inputs.gh-org }}/keycloak -p keycloak-${{ inputs.version }}.tar.gz -D ./quarkus/container ${{ inputs.tag }}
+          ${{ github.workspace }}/keycloak-rel/.github/scripts/retry.sh "gh release download -R ${{ inputs.gh-org }}/keycloak -p keycloak-${{ inputs.version }}.tar.gz -D ./quarkus/container ${{ inputs.tag }}" 
 
       - name: Build and push
         uses: docker/build-push-action@v2.10.0
         with:
-          context: quarkus/container
+          context: ${{ github.workspace }}/keycloak/quarkus/container
           platforms: linux/amd64,linux/arm64,linux/ppc64le
           push: true
           tags: ${{ steps.meta.outputs.tags }}
