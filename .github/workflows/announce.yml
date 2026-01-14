@@ -49,6 +49,7 @@ jobs:
     needs: [env]
     with:
       gh-org: ${{ needs.env.outputs.gh-org }}
+      keycloak-rel-org: ${{ needs.env.outputs.keycloak-rel-org }}
       component: ${{ github.event.inputs.component }}
       version: ${{ github.event.inputs.version }}
     secrets:
