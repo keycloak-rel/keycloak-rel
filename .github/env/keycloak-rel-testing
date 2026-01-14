@@ -1,4 +1,5 @@
 gh-org=keycloak-rel-testing
+keycloak-rel-org=keycloak-rel-testing
 
 mvn-deploy-options=-DaltDeploymentRepository=keycloak-publish::default::https://maven.pkg.github.com/keycloak-rel-testing/maven
 

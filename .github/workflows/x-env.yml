@@ -6,6 +6,9 @@ on:
       gh-org:
         description: "GitHub Organization"
         value: ${{ jobs.env.outputs.gh-org }}
+      keycloak-rel-org:
+        description: "GitHub Organization for keycloak-rel repository"
+        value: ${{ jobs.env.outputs.keycloak-rel-org }}
       mvn-deploy-options:
         description: "Maven Deploy Options"
         value: ${{ jobs.env.outputs.mvn-deploy-options }}
@@ -37,6 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       gh-org: ${{ env.gh-org }}
+      keycloak-rel-org: ${{ env.keycloak-rel-org }}
       mvn-deploy-options: ${{ env.mvn-deploy-options }}
       quay-org: ${{ env.quay-org }}
       docker-org: ${{ env.docker-org }}
