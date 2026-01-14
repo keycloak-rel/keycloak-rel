@@ -1,4 +1,5 @@
 gh-org=keycloak
+keycloak-rel-org=keycloak-rel
 
 mvn-deploy-options=-Pcentral-staging
 
