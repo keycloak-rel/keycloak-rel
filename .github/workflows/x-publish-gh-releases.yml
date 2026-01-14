@@ -21,8 +21,16 @@ jobs:
   publish-gh-releases:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout scripts repository to the runner
+        uses: actions/checkout@v3
+        with:
+          repository: "${{ inputs.gh-org }}/keycloak-rel"
+          token: ${{ secrets.GH_TOKEN }}
+          path: keycloak-rel
+
       - name: Publish release
-        run: gh release edit ${{ inputs.tag }} --repo ${{ inputs.gh-org }}/keycloak --draft=false
+        run: |
+          $GITHUB_WORKSPACE/keycloak-rel/.github/scripts/retry.sh "gh release edit ${{ inputs.tag }} --repo ${{ inputs.gh-org }}/keycloak --draft=false"
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
