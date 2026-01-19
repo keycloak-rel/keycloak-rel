@@ -110,7 +110,7 @@ jobs:
 
   publish-keycloak-operator-hub:
     name: Publish Keycloak Operator to OperatorHub
-    needs: [ env, keycloak-operator]
+    needs: [ env, keycloak-operator ]
     uses: ./.github/workflows/x-keycloak-operator-hub-publish.yml
     with:
       version: ${{ github.event.inputs.version }}
