@@ -78,6 +78,7 @@ jobs:
     uses: ./.github/workflows/x-keycloak-container.yml
     with:
       gh-org: ${{ needs.env.outputs.gh-org }}
+      keycloak-rel-org: ${{ needs.env.outputs.keycloak-rel-org }}
       quay-org: ${{ needs.env.outputs.quay-org }}
       docker-org: ${{ needs.env.outputs.docker-org }}
       version: ${{ github.event.inputs.version }}
@@ -126,6 +127,7 @@ jobs:
     uses: ./.github/workflows/x-publish-gh-releases.yml
     with:
       gh-org: ${{ needs.env.outputs.gh-org }}
+      keycloak-rel-org: ${{ needs.env.outputs.keycloak-rel-org }}
       tag: ${{ github.event.inputs.version }}
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -136,6 +138,7 @@ jobs:
     uses: ./.github/workflows/x-publish-npm.yml
     with:
       gh-org: ${{ needs.env.outputs.gh-org }}
+      keycloak-rel-org: ${{ needs.env.outputs.keycloak-rel-org }}
       tag: ${{ github.event.inputs.version }}
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
