@@ -59,18 +59,26 @@ jobs:
         distribution: temurin
         java-version: 17
 
-    - name: Create proto.lock files
-      run: ./mvnw install -DskipTests -am -pl model/infinispan -DcommitProtoLockChanges=true
+    - name: Create proto.lock and DB snapshot files
+      run: ./mvnw install -DskipTests -am -pl model/infinispan,model/jpa,model/storage-private -DcommitProtoLockChanges=true -Pdb-snapshot
 
     - name: Create release branch
       run: git checkout -b release/${{ github.event.inputs.majorMinorVersion }}
 
-    - name: Commit unstaged proto.lock files to branch
+    - name: Configure git
       run: |
         git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
         git config --global user.name "github-actions[bot]"
+
+    - name: Commit unstaged proto.lock files to branch
+      run: |
         git add **/proto.lock
         git commit -s -m "Committing **/proto.lock changes"
+
+    - name: Commit unstaged database files to branch
+      run: |
+        git add **/rolling-upgrades-*-changes.json
+        git commit -s -m "Committing database snapshot"
 
     - name: Push release branch
       run: git push origin release/${{ github.event.inputs.majorMinorVersion }}
