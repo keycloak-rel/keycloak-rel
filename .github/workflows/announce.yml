@@ -19,6 +19,10 @@ on:
 
 concurrency: rel-${{ github.ref }}
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
 
   show-inputs:
@@ -31,9 +35,28 @@ jobs:
   env:
     uses: ./.github/workflows/x-env.yml
 
+  check-gh-release-presence:
+    name: Check presence of corresponding release
+    runs-on: ubuntu-latest
+    needs: [env]
+    steps:
+      - run: |
+          if [[ "${{ inputs.component }}" == "keycloak-server" ]]; then
+            gh release ${{ inputs.version }} --repo ${{ needs.env.outputs.gh-org }}/keycloak --json assets >> $GITHUB_STEP_SUMMARY
+          elif [[ "${{ inputs.component }}" == "keycloak-js" ]]; then
+            gh release ${{ inputs.version }} --repo ${{ needs.env.outputs.gh-org }}/keycloak-js --json assets >> $GITHUB_STEP_SUMMARY
+          elif [[ "${{ inputs.component }}" == "keycloak-client" ]]; then
+            gh release ${{ inputs.version }} --repo ${{ needs.env.outputs.gh-org }}/keycloak-client --json assets >> $GITHUB_STEP_SUMMARY
+          elif [[ "${{ inputs.component }}" == "keycloak-nodejs-connect" ]]; then
+            gh release ${{ inputs.version }} --repo ${{ needs.env.outputs.gh-org }}/keycloak-nodejs-connect --json assets >> $GITHUB_STEP_SUMMARY
+          else
+            echo "Announce of component '${{ inputs.component }}' is not supported." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi 
+
   keycloak-quickstarts:
     name: Keycloak QuickStarts
-    needs: [env]
+    needs: [env,check-gh-release-presence]
     uses: ./.github/workflows/x-keycloak-quickstarts.yml
     with:
       gh-org: ${{ needs.env.outputs.gh-org }}
@@ -46,7 +69,7 @@ jobs:
   update-website:
     name: Update website
     uses: ./.github/workflows/x-keycloak-web.yml
-    needs: [env]
+    needs: [env,check-gh-release-presence]
     with:
       gh-org: ${{ needs.env.outputs.gh-org }}
       component: ${{ github.event.inputs.component }}
