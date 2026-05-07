@@ -6,9 +6,6 @@ on:
       gh-org:
         required: true
         type: string
-      keycloak-rel-org:
-        required: true
-        type: string
       quay-org:
         required: true
         type: string
@@ -49,7 +46,7 @@ jobs:
       - name: Checkout scripts repository to the runner
         uses: actions/checkout@v3
         with:
-          repository: "${{ inputs.keycloak-rel-org }}/keycloak-rel"
+          repository: "${{ github.repository_owner }}/keycloak-rel"
           token: ${{ secrets.GH_TOKEN }}
           path: keycloak-rel
 

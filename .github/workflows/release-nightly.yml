@@ -61,7 +61,6 @@ jobs:
     uses: ./.github/workflows/x-keycloak-container.yml
     with:
       gh-org: ${{ needs.env.outputs.gh-org }}
-      keycloak-rel-org: ${{ needs.env.outputs.keycloak-rel-org }}
       quay-org: ${{ needs.env.outputs.quay-org }}
       docker-org: ${{ needs.env.outputs.docker-org }}
       version: 999.0.0-SNAPSHOT
@@ -110,7 +109,6 @@ jobs:
     uses: ./.github/workflows/x-publish-gh-releases.yml
     with:
       gh-org: ${{ needs.env.outputs.gh-org }}
-      keycloak-rel-org: ${{ needs.env.outputs.keycloak-rel-org }}
       tag: nightly
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
