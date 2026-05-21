@@ -1,0 +1,21 @@
+name: Re-spin Containers Conditionally
+on:
+  schedule:
+    - cron: '0 5 * * *'
+  workflow_dispatch:
+
+jobs:
+  check-containers:
+    runs-on: ubuntu-latest
+    if: github.repository_owner == 'keycloak-rel'
+    permissions:
+      actions: write
+    steps:
+      - uses: actions/checkout@v3
+      - uses: aquasecurity/setup-trivy@v0.2.6
+        with:
+          cache: true
+          version: latest
+      - run: .github/scripts/check-cve-updates-for-keycloak-image.sh
+        env:
+          GH_TOKEN: ${{ github.token }}
