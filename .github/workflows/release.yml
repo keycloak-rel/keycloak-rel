@@ -41,7 +41,7 @@ jobs:
       gh-org: ${{ needs.env.outputs.gh-org }}
       tag: ${{ github.event.inputs.version }}
       branch: ${{ github.event.inputs.branch }}
-      set-versions: true
+      set-versions: false
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
 

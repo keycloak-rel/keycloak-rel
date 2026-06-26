@@ -47,10 +47,12 @@ jobs:
           git commit -a -m "Set version to ${{ inputs.tag }}"
 
       - name: Tag commit
+        if: inputs.set-versions
         working-directory: keycloak
         run: git tag --force ${{ inputs.tag }}
 
       - name: Push changes
+        if: inputs.set-versions
         working-directory: keycloak
         run: git push --force origin refs/tags/${{ inputs.tag }}
 

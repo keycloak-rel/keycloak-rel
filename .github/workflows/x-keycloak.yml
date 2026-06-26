@@ -62,7 +62,7 @@ jobs:
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
           MVN_HTTP_CONFIG="-Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.http.retryHandler.class=standard -Dmaven.wagon.http.retryHandler.count=3 -Dmaven.wagon.httpconnectionManager.ttlSeconds=120"
-          ./mvnw -nsu -B -Pgpg,jboss-release,distribution-downloads,all ${{ inputs.mvn-deploy-options }} -DskipTests -DskipTestsuite -DskipProjectTests $MVN_HTTP_CONFIG clean deploy
+          ./mvnw -nsu -B -Pgpg,jboss-release,distribution-downloads,all ${{ inputs.mvn-deploy-options }} -DskipTests -DskipTestsuite -DskipProjectTests $MVN_HTTP_CONFIG clean install
 
       - name: Upload to GitHub Releases
         env:
@@ -72,7 +72,31 @@ jobs:
           for i in `gh release view ${{ inputs.tag }} --json assets --jq '.assets[].name'`; do 
             test -f $i || gh release delete-asset ${{ inputs.tag }} $i -y 
           done
-          gh release upload ${{ inputs.tag }} ${{ inputs.version }}/* --clobber
+          gh release upload ${{ inputs.tag }} ${{ inputs.version }}/*.tgz --clobber
+          
+          rm -rf mvn-orig/ 
+          mkdir mvn-orig
+          curl -L -s -o mvn-orig/keycloak-26.6.4.tar.gz https://repo1.maven.org/maven2/org/keycloak/keycloak-quarkus-dist/26.6.4/keycloak-quarkus-dist-26.6.4.tar.gz
+          curl -L -s -o mvn-orig/keycloak-26.6.4.tar.gz.asc https://repo1.maven.org/maven2/org/keycloak/keycloak-quarkus-dist/26.6.4/keycloak-quarkus-dist-26.6.4.tar.gz.asc
+          curl -L -s -o mvn-orig/keycloak-26.6.4.tar.gz.md5 https://repo1.maven.org/maven2/org/keycloak/keycloak-quarkus-dist/26.6.4/keycloak-quarkus-dist-26.6.4.tar.gz.md5
+          curl -L -s -o mvn-orig/keycloak-26.6.4.tar.gz.sha1 https://repo1.maven.org/maven2/org/keycloak/keycloak-quarkus-dist/26.6.4/keycloak-quarkus-dist-26.6.4.tar.gz.sha1
+
+          curl -L -s -o mvn-orig/keycloak-26.6.4.zip https://repo1.maven.org/maven2/org/keycloak/keycloak-quarkus-dist/26.6.4/keycloak-quarkus-dist-26.6.4.zip
+          curl -L -s -o mvn-orig/keycloak-26.6.4.zip.asc https://repo1.maven.org/maven2/org/keycloak/keycloak-quarkus-dist/26.6.4/keycloak-quarkus-dist-26.6.4.zip.asc
+          curl -L -s -o mvn-orig/keycloak-26.6.4.zip.md5 https://repo1.maven.org/maven2/org/keycloak/keycloak-quarkus-dist/26.6.4/keycloak-quarkus-dist-26.6.4.zip.md5
+          curl -L -s -o mvn-orig/keycloak-26.6.4.zip.sha1 https://repo1.maven.org/maven2/org/keycloak/keycloak-quarkus-dist/26.6.4/keycloak-quarkus-dist-26.6.4.zip.sha1
+
+          curl -L -s -o mvn-orig/keycloak-api-docs-26.6.4.zip https://repo1.maven.org/maven2/org/keycloak/keycloak-api-docs-dist/26.6.4/keycloak-api-docs-dist-26.6.4.zip
+          curl -L -s -o mvn-orig/keycloak-api-docs-26.6.4.zip.asc https://repo1.maven.org/maven2/org/keycloak/keycloak-api-docs-dist/26.6.4/keycloak-api-docs-dist-26.6.4.zip.asc
+          curl -L -s -o mvn-orig/keycloak-api-docs-26.6.4.zip.md5 https://repo1.maven.org/maven2/org/keycloak/keycloak-api-docs-dist/26.6.4/keycloak-api-docs-dist-26.6.4.zip.md5
+          curl -L -s -o mvn-orig/keycloak-api-docs-26.6.4.zip.sha1 https://repo1.maven.org/maven2/org/keycloak/keycloak-api-docs-dist/26.6.4/keycloak-api-docs-dist-26.6.4.zip.sha1
+
+          curl -L -s -o mvn-orig/keycloak-documentation-26.6.4.zip https://repo1.maven.org/maven2/org/keycloak/documentation/keycloak-documentation/26.6.4/keycloak-documentation-26.6.4.zip
+          curl -L -s -o mvn-orig/keycloak-documentation-26.6.4.zip.asc https://repo1.maven.org/maven2/org/keycloak/documentation/keycloak-documentation/26.6.4/keycloak-documentation-26.6.4.zip.asc
+          curl -L -s -o mvn-orig/keycloak-documentation-26.6.4.zip.md5 https://repo1.maven.org/maven2/org/keycloak/documentation/keycloak-documentation/26.6.4/keycloak-documentation-26.6.4.zip.md5
+          curl -L -s -o mvn-orig/keycloak-documentation-26.6.4.zip.sha1 https://repo1.maven.org/maven2/org/keycloak/documentation/keycloak-documentation/26.6.4/keycloak-documentation-26.6.4.zip.sha1
+
+          gh release upload ${{ inputs.tag }} mvn-orig/keycloak-* --clobber
 
       - name: Show GitHub Release artifacts
         run: |
