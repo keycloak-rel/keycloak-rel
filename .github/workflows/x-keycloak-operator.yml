@@ -145,7 +145,7 @@ jobs:
           path: keycloak-k8s-resources
           token: ${{ secrets.GH_TOKEN }}
 
-      - name: Update k8s resources
+      - name: Update k8s resources and push the helm chart
         working-directory: keycloak-k8s-resources
         run: |
           rm -rf kubernetes
@@ -159,7 +159,13 @@ jobs:
               -DskipTests \
               -Dquarkus.container-image.image=quay.io/${{ inputs.quay-org }}/keycloak-operator:${{ inputs.tag }} \
               -Dkc.operator.keycloak.image=quay.io/${{ inputs.quay-org }}/keycloak:${{ inputs.tag }} \
+              -Dquarkus.helm.version=${{ inputs.tag }} \
               -Pcluster-wide
+
+          // create the operator helm chart
+          helm package operator/target/helm/kubernetes/keycloak-operator
+          helm push keycloak-operator-${{ inputs.tag }}.tgz oci://quay.io/${{ inputs.quay-org }}/keycloak-operator-helm
+
           cd ../keycloak-k8s-resources
 
           mkdir -p kubernetes/cluster-wide
